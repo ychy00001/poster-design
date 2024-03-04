@@ -17,6 +17,8 @@
         </div>
       </el-collapse-item>
       <el-collapse-item title="设置" name="2">
+        <toggle-switch v-model="innerElement.isAI" label="AI填充" @finish="(value) => finishAIToggle('isAI', value)" />
+        <toggle-switch v-model="innerElement.isSegmentation" label="抠图填充" @finish="(value) => finishAIToggle('isSegmentation', value)" />
         <!-- <el-button size="mini" style="width: 100%; margin-top: 0.5rem" plain @click="openCropper">替换图片</el-button> -->
         <el-button style="width: 100%; margin-bottom: 12px" plain @click="openPicBox">替换图片</el-button>
         <div class="options">
@@ -61,6 +63,7 @@
 const NAME = 'w-image-style'
 import { mapGetters, mapActions } from 'vuex'
 import numberInput from '../../settings/numberInput.vue'
+import toggleSwitch from '../../settings/toggleSwitch.vue'
 import iconItemSelect from '../../settings/iconItemSelect.vue'
 import numberSlider from '../../settings/numberSlider.vue'
 // import textInput from '../../settings/textInput.vue'
@@ -76,7 +79,7 @@ import imageCutout from '@/components/business/image-cutout'
 
 export default {
   name: NAME,
-  components: { numberInput, numberSlider, iconItemSelect, picBox, imageCutout },
+  components: { toggleSwitch, numberInput, numberSlider, iconItemSelect, picBox, imageCutout },
   data() {
     return {
       picBoxShow: false,
@@ -167,6 +170,23 @@ export default {
           value: data,
           pushHistory: true,
         })
+      }
+    },
+    finishAIToggle(key, value){
+      if(key == "isAI"){
+        if(value && this.innerElement.isSegmentation){
+          this.innerElement.isSegmentation = false
+          this.finish('isSegmentation', false)
+        }
+        this.innerElement.isAI = value
+        this.finish('isAI', value)
+      }else if(key == "isSegmentation"){
+        if(value && this.innerElement.isAI){
+          this.innerElement.isAI = false
+          this.finish('isAI', false)
+        }
+        this.innerElement.isSegmentation = value
+        this.finish('isSegmentation', value)
       }
     },
     finish(key, value) {

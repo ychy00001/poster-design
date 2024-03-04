@@ -206,6 +206,7 @@ export default {
     dblclickText(e) {
       // this.$store.commit('setShowMoveable', false)
       this.editable = true
+      console.log("点击编辑")
       const el = this.$refs.editWrap || this.$refs.widget
       setTimeout(() => {
         el.focus()

@@ -43,16 +43,16 @@ export default defineComponent({
       materialCates: [],
       currentIndex: 1,
     })
-
-    if (props.type != 'none') {
-      api.home.getCategories({ type: 1 }).then((list: any) => {
-        list.unshift({ id: 0, name: '全部' })
-        state.materialCates = list
-        const { cate } = route.query
-        cate && (state.currentIndex = cate)
-        cate && action('change', state.materialCates[Number(cate)], Number(cate))
-      })
-    }
+  
+    // if (props.type != 'none') {
+    //   api.home.getCategories({ type: 1 }).then((list: any) => {
+    //     list.unshift({ id: 0, name: '全部' })
+    //     state.materialCates = list
+    //     const { cate } = route.query
+    //     cate && (state.currentIndex = cate)
+    //     cate && action('change', state.materialCates[Number(cate)], Number(cate))
+    //   })
+    // }
 
     watch(
       () => state.searchValue,
@@ -70,6 +70,20 @@ export default defineComponent({
       action,
     }
   },
+  mounted(){
+    const route = useRoute()
+    let catList = [
+      {
+          id: 1,
+          name: '食品'
+      }
+    ]
+    catList.unshift({ id: 0, name: '全部' })
+    this.materialCates = catList
+    const { cate } = route.query
+    cate && (this.currentIndex = cate)
+    cate && this.action('change', this.materialCates[Number(cate)], Number(cate))
+  }
 })
 </script>
 

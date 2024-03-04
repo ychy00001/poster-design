@@ -14,8 +14,8 @@ import { defineComponent, reactive, toRefs, watch, getCurrentInstance, Component
 import { mapGetters, mapActions } from 'vuex'
 import html2canvas from 'html2canvas'
 import api from '@/api'
-import Qiniu from '@/common/methods/QiNiu'
-import Minio from '@/common/methods/Minio'
+import {uuid} from '@/utils/utils'
+import { ElMessage as ElMsg } from 'element-plus'
 
 export default defineComponent({
   props: ['modelValue'],
@@ -35,25 +35,44 @@ export default defineComponent({
         scale: 0.2,
       }
       setTimeout(async () => {
-        const clonePage: HTMLElement = document.getElementById('page-design-canvas').cloneNode(true)
+        const clonePage: HTMLElement = document.getElementById('page-design-canvas')?.cloneNode(true)
         console.log(clonePage)
         clonePage.setAttribute('id', 'clone-page')
         document.body.appendChild(clonePage)
         html2canvas(document.getElementById('clone-page'), opts).then((canvas: any) => {
-          console.log(canvas)
+          document.body.appendChild(canvas);
           canvas.toBlob(
             async (blobObj: Blob) => {
-              const result: any = await Qiniu.upload(blobObj, { bucket: 'xp-design', prePath: 'cover/user' })
-              console.log(result)
-              cb(result)
+              // console.log(blobObj)
+              // let a = new FileReader();
+              // a.readAsDataURL(blobObj);
+              // a.onload = function(e){
+              //   let getBase64 = e.target.result;
+              //   console.log("base64");
+              //   console.log(getBase64);
+              // }
+              const uploadName = uuid(8,16) + ".jpeg"
+              // console.log("uploadCoverName: %s", uploadName)
+              // 上传至Minio
+              const {preSignedUrl, imgUrl} = await api.minio.genPreSignedURL({
+                objectName: uploadName
+              })
+              console.log("preSignedUrl: %s, imgUrl: %s", preSignedUrl,imgUrl)
+              const file = new File([blobObj], uploadName, {type: 'image/jpeg'})
+              const result = await api.minio.fileUploadWithPresigned(preSignedUrl,file)
+              if(result == ""){
+                cb(imgUrl)
+              }else{
+                cb(null)
+              }
             },
             'image/jpeg',
-            0.15,
+            0.3,
           )
           proxy?.updateZoom(nowZoom)
           clonePage.remove()
         })
-      }, 100)
+      }, 10)
     }
 
     return {

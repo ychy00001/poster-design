@@ -7,13 +7,19 @@
       <bg-img-list-wrap style="padding-top: 2rem;" model="stylePanel" />
     </div>
     <el-collapse v-else v-model="activeNames">
-      <el-collapse-item title="画布尺寸" name="1">
+      <el-collapse-item title="元数据" name="1">
+        <div class="position-size">
+          <text-input-area v-model="keyword" label="关键词" :max="100" @finish="(value) => changeKeyword(value)" />
+        </div>
+      </el-collapse-item>
+      <el-collapse-item title="画布尺寸" name="2">
         <div class="position-size">
           <number-input v-model="innerElement.width" label="宽" :maxValue="5000" @finish="(value) => finish('width', value)" />
           <number-input v-model="innerElement.height" label="高" :maxValue="5000" @finish="(value) => finish('height', value)" />
         </div>
       </el-collapse-item>
-      <el-collapse-item title="背景设置" name="2">
+      <el-collapse-item title="背景设置" name="3">
+        <toggle-switch v-model="innerElement.isAI" label="AI填充" @finish="(value) => finish('isAI', value)" />
         <el-button style="width: 100%; margin: 0 0 1rem 0;" type="primary" link @click="showBgLib = true">在背景库中选择</el-button>
         <Tabs :value="mode" @update:value="onChangeMode">
           <TabPanel v-for="label in modes" :key="label" :label="label"></TabPanel>
@@ -39,6 +45,8 @@
 const NAME = 'page-style'
 import { mapGetters, mapActions } from 'vuex'
 import numberInput from '../settings/numberInput.vue'
+import textInputArea from '../settings/textInputArea.vue'
+import toggleSwitch from '../settings/toggleSwitch.vue'
 import colorSelect from '../settings/colorSelect.vue'
 import uploader from '@/components/common/Uploader/index.vue'
 import api from '@/api'
@@ -49,7 +57,7 @@ import TabPanel from '@palxp/color-picker/comps/TabPanel.vue'
 
 export default {
   name: NAME,
-  components: { numberInput, colorSelect, uploader, Tabs, TabPanel },
+  components: { toggleSwitch, textInputArea, numberInput, colorSelect, uploader, Tabs, TabPanel },
   data() {
     return {
       activeNames: ['1', '2', '3', '4'],
@@ -59,11 +67,12 @@ export default {
       downP: 0,
       mode: '颜色',
       modes: ['颜色', '图片'],
-      showBgLib: false
+      showBgLib: false,
+      keyword: ''
     }
   },
   computed: {
-    ...mapGetters(['dActiveElement']),
+    ...mapGetters(['dKeyword','dActiveElement']),
   },
   watch: {
     dActiveElement: {
@@ -83,7 +92,7 @@ export default {
     this.change()
   },
   methods: {
-    ...mapActions(['updatePageData']),
+    ...mapActions(['updatePageData', 'setDKeyword']),
     colorChange(e) {
       if (e.mode === '渐变') {
         // setTimeout(() => {
@@ -102,10 +111,14 @@ export default {
       }
     },
     change() {
+      this.keyword = this.dKeyword
       this.mode = this.modes[0]
       this.tag = true
       this.innerElement = JSON.parse(JSON.stringify(this.dActiveElement))
       this.innerElement.backgroundImage && (this.mode = this.modes[1])
+    },
+    changeKeyword(value){
+      this.$store.commit('setDKeyword', value) 
     },
     changeValue() {
       if (this.tag) {

@@ -7,14 +7,14 @@
 -->
 <template>
   <div id="appindex">
-    <div class="viewWrap">
-      <router-view />
-    </div>
+    <router-view />
   </div>
 </template>
 
 <style lang="less">
 #appindex {
+  height: 100%;
+  width:100%;
   min-width: 1180px;
   .viewWrap {
     min-height: calc(110vh - 110px);

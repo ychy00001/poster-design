@@ -26,18 +26,41 @@ export default [
     redirect: 'home',
   },
   {
-    path: '/home',
-    name: 'Home',
-    component: () => import(/* webpackChunkName: 'base' */ '@/views/Index.vue'),
-  },
-  {
     path: '/draw',
     name: 'Draw',
-    component: () => import(/* webpackChunkName: 'draw' */ '@/views/Draw.vue'),
+    component: () => import(/* webpackChunkName: 'draw' */ '@/views/draw/Draw.vue'),
   },
   {
-    path: '/psd',
-    name: 'Psd',
-    component: () => import(/* webpackChunkName: 'psd' */ '@/views/Psd.vue'),
+    path: '/cw_draw',
+    name: 'CwDraw',
+    component: () => import(/* webpackChunkName: 'draw' */ '@/views/draw/CwDraw.vue'),
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    redirect: '/welcome',
+    component: () => import(/* webpackChunkName: 'base' */ '@/views/Index.vue'),
+    children: [
+      {
+        path: '/welcome',
+        name: 'Welcome',
+        component: () => import(/* webpackChunkName: 'base' */ '@/views/welcome/Index.vue'),
+      },
+      {
+        path: '/design',
+        name: 'Design',
+        component: () => import(/* webpackChunkName: 'base' */ '@/views/design/Index.vue'),
+      },
+      {
+        path: '/edit',
+        name: 'Edit',
+        component: () => import(/* webpackChunkName: 'base' */ '@/views/edit/Index.vue'),
+      },
+      {
+        path: '/psd',
+        name: 'Psd',
+        component: () => import(/* webpackChunkName: 'psd' */ '@/views/psd/Psd.vue'),
+      }
+    ]
   },
 ]

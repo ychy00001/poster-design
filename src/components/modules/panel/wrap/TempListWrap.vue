@@ -43,7 +43,7 @@ export default defineComponent({
       title: '推荐模板',
       searchKeyword: '',
     })
-    const pageOptions: any = { page: 0, pageSize: 20, cate: 1 }
+    const pageOptions: any = { pageNo: 0, pageSize: 20, cate: 1 }
     const { cate, edit } = route.query
     cate && (pageOptions.cate = cate)
     edit && store.commit('managerEdit', true)
@@ -56,7 +56,7 @@ export default defineComponent({
       if (init) {
         listRef.value.scrollTop = 0
         state.list = []
-        pageOptions.page = 0
+        pageOptions.pageNo = 0
         state.loadDone = false
       }
       if (state.loadDone || state.loading) {
@@ -64,9 +64,9 @@ export default defineComponent({
       }
 
       state.loading = true
-      pageOptions.page += 1
-
-      const res = await api.home.getTempList({ search: state.searchKeyword, ...pageOptions })
+      pageOptions.pageNo += 1
+      console.log(state.searchKeyword)
+      const res = await api.template.page({ keyword: state.searchKeyword, ...pageOptions })
       res.list.length <= 0 && (state.loadDone = true)
       state.list = state.list.concat(res.list)
 
@@ -100,7 +100,7 @@ export default defineComponent({
     ...mapGetters(['tempEditing', 'dHistoryParams']),
   },
   methods: {
-    ...mapActions(['selectWidget', 'updatePageData', 'setTemplate', 'pushHistory']),
+    ...mapActions(['setDEditTemplateId','selectWidget', 'updatePageData', 'setTemplate', 'pushHistory']),
     async selectItem(item: any) {
       this.$store.commit('setShowMoveable', false) // 清理掉上一次的选择框
       if (this.dHistoryParams.length > 0) {
@@ -160,7 +160,8 @@ export default defineComponent({
     // },
     setTempId(tempId: number | string) {
       const { id } = this.$route.query
-      this.$router.push({ path: '/home', query: { tempid: tempId, id }, replace: true })
+      this.$store.commit('setDEditTemplateId', tempId)
+      this.$router.push({ path: '/design', query: { tempid: tempId, id }, replace: true })
     },
   },
 })

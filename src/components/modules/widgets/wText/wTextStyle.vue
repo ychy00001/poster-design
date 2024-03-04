@@ -41,6 +41,7 @@
 
       <!-- v-show="!innerElement.editable"  -->
       <div style="margin-top: 10px" class="line-layout style-item">
+        <toggle-switch v-model="innerElement.isAI" label="AI填充" @finish="(value) => finish('isAI', value)" />
         <text-input-area v-model="innerElement.text" @finish="(value) => finish('text', value)" />
       </div>
       <!-- </el-collapse-item> -->
@@ -58,6 +59,7 @@ import { styleIconList1, styleIconList2, alignIconList } from '../../../../asset
 import layerIconList from '@/assets/data/LayerIconList'
 import numberInput from '../../settings/numberInput.vue'
 import numberSlider from '../../settings/numberSlider.vue'
+import toggleSwitch from '../../settings/toggleSwitch.vue'
 import colorSelect from '../../settings/colorSelect.vue'
 import iconItemSelect from '../../settings/iconItemSelect.vue'
 import textInputArea from '../../settings/textInputArea.vue'
@@ -68,7 +70,7 @@ import usePageFontsFilter from './pageFontsFilter.ts'
 
 export default {
   name: NAME,
-  components: { numberInput, colorSelect, iconItemSelect, textInputArea, valueSelect, effectWrap, numberSlider },
+  components: { toggleSwitch, numberInput, colorSelect, iconItemSelect, textInputArea, valueSelect, effectWrap, numberSlider },
   data() {
     return {
       activeNames: [],

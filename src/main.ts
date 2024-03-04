@@ -12,9 +12,15 @@ import store from './store'
 import utils from './utils'
 import 'normalize.css/normalize.css'
 import '@/assets/styles/index.less'
+import '@/assets/css/icon.css'
 import elementConfig from './utils/widgets/elementConfig'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const app = createApp(App)
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
 
 elementConfig.components.forEach((component) => {
   app.component(component.name, component)

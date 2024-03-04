@@ -7,6 +7,7 @@
           <p>{{ item.name }}</p>
         </li>
       </ul>
+      <a href="https://github.com/palxiao/poster-design" target="_blank" class="github"><img src="https://fe-doc.palxp.cn/images/github.svg" alt="Github" title="Github" /> 源码</a>
     </div>
     <div v-show="active" class="widget-wrap">
       <keep-alive>
@@ -24,8 +25,8 @@
 
 <script lang="ts">
 // 组件面板
-const NAME = 'widget-panel'
-import widgetClassifyListData from '@/assets/data/WidgetClassifyList.ts'
+const NAME = 'widget-panel-edit'
+import widgetClassifyListData from '@/assets/data/WidgetClassifyListEdit.ts'
 import { reactive, toRefs, onMounted, watch, nextTick, getCurrentInstance, ComponentInternalInstance } from 'vue'
 import { mapActions } from 'vuex'
 import { useRoute } from 'vue-router'

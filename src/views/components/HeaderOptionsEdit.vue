@@ -11,14 +11,12 @@
     <template v-if="tempEditing">
       <span style="color: #999; font-size: 14px; margin-right: 0.5rem">{{ stateBollean ? '启用' : '停用' }}</span> <el-switch v-model="stateBollean" @change="stateChange" />
       <div class="divide__line">|</div>
-      <el-button  plain type="primary" @click="saveTemp">保存模板</el-button>
+      <el-button plain type="primary" @click="saveTemp">保存模板</el-button>
       <el-button @click="$store.commit('managerEdit', false)">取消</el-button>
       <div class="divide__line">|</div>
     </template>
     <!-- <el-button @click="draw">绘制(测试)</el-button> -->
-    <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false)">保存模板</el-button>
-    <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true)">另存模板</el-button>
-    <el-button v-else :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true)">新建模板</el-button>
+    <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="save(true)">保存</el-button>
     <copyRight>
       <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" plain type="primary" @click="download">下载作品</el-button>
     </copyRight>
@@ -55,26 +53,66 @@ export default defineComponent({
       title: '',
       loading: false,
       bizName: '',
+      keyword: '',
+      templateId: -1,
     })
 
     // 保存作品
     async function save(hasCover: boolean = false) {
+      if (state.loading === true) {
+        return
+      }
+      state.loading = true
       // Bugs: 历史操作有问题，且page操作未及时入栈 proxy?.dPageHistory
       if (proxy?.dHistory.length <= 0) {
+        state.loading = false
         return
       }
       store.commit('setShowMoveable', false) // 清理掉上一次的选择框
       // console.log(proxy?.dPage, proxy?.dWidgets)
       const { id, tempid } = route.query
+
+      context.emit('update:modelValue', true)
+      context.emit('change', { downloadPercent: 1, downloadText: '正在生成封面' })
+
+      let timerCount = 0
+      const animation = setInterval(() => {
+        if (props.modelValue && timerCount < 75) {
+          timerCount += RandomNumber(1, 10)
+          context.emit('change', { downloadPercent: 1 + timerCount, downloadText: '正在合成图片' })
+        } else {
+          clearInterval(animation)
+        }
+      }, 800)
       const cover = hasCover ? await proxy?.draw() : undefined
+      clearInterval(animation)
+      console.log("generateCover:", cover)
       const widgets = proxy.dWidgets // reviseData()
-      const { id: newId, stat, msg } = await api.home.saveWorks({ cover, id, title: proxy.title || '未命名设计', data: JSON.stringify({ page: proxy.dPage, widgets }), temp_id: tempid, width: proxy.dPage.width, height: proxy.dPage.height })
-      stat !== 0 ? useNotification('保存成功', '可在"我的作品"中查看') : useNotification('保存失败', msg, { type: 'error' })
-      !id && router.push({ path: '/edit', query: { id: newId }, replace: true })
+      context.emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
+      const updateResult = await api.poster.update({ id, 
+          title: proxy.title || '未命名设计', 
+          bizName: proxy.bizName,
+          keyword: proxy.dKeyword,
+          templateId: proxy.templateId, 
+          cover, 
+          data: JSON.stringify({ page: proxy.dPage, widgets }), 
+          width: proxy.dPage.width, 
+          height: proxy.dPage.height,
+          status: 1
+      })
+      context.emit('change', { downloadPercent: 100, downloadText: '保存完成' })
+
+      if(!updateResult.code){
+        useNotification('保存成功', '可在"我的作品"中查看')
+      }else{
+        useNotification('保存失败', updateResult.msg, { type: 'error' })
+      }
+      state.loading = false
+      !id && router.push({ path: '/edit', query: { id: id }, replace: true })
       store.commit('setShowMoveable', true)
     }
     // 保存模板
-    async function saveTemp(isCreate:boolean) {
+    async function saveTemp() {
       const { tempid, tempType: type } = route.query
       let res = null
       if (type == 1) {
@@ -92,53 +130,7 @@ export default defineComponent({
           // proxy.dWidgets.push(wGroup.setting)
         }
         res = await api.home.saveTemp({ id: tempid, type, title: proxy.title || '未命名组件', content: JSON.stringify(proxy.dWidgets), width: proxy.dPage.width, height: proxy.dPage.height })
-      } else {
-        context.emit('update:modelValue', true)
-        context.emit('change', { downloadPercent: 1, downloadText: '正在生成封面' })
-
-        let timerCount = 0
-        const animation = setInterval(() => {
-          if (props.modelValue && timerCount < 75) {
-            timerCount += RandomNumber(1, 10)
-            context.emit('change', { downloadPercent: 1 + timerCount, downloadText: '正在合成图片' })
-          } else {
-            clearInterval(animation)
-          }
-        }, 800)
-        const cover = await proxy?.draw()
-        clearInterval(animation)
-        context.emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
-        if(tempid && !isCreate){
-          res = await api.template.update(
-          { 
-            id: tempid, 
-            title: proxy.title || '未命名模板', 
-            bizName: proxy.bizName,
-            keyword: proxy.dKeyword,
-            cover: cover,
-            data: JSON.stringify({ page: proxy.dPage, widgets: proxy.dWidgets }), 
-            width: proxy.dPage.width, 
-            height: proxy.dPage.height,
-            status: 1
-          })
-        }else{
-          res = await api.template.create(
-          { 
-            title: proxy.title || '未命名模板', 
-            bizName: proxy.bizName,
-            keyword: proxy.dKeyword,
-            cover: cover,
-            data: JSON.stringify({ page: proxy.dPage, widgets: proxy.dWidgets }), 
-            width: proxy.dPage.width, 
-            height: proxy.dPage.height,
-            status: 1
-          })
-          this.$store.commit('setDEditTemplateId', res)
-          this.$router.push({ path: '/design', query: { tempid: res }, replace: true })
-        }
-        context.emit('change', { downloadPercent: 100, downloadText: '保存完成' })
-      }
-      console.log(res)
+      } else res = await api.home.saveTemp({ id: tempid, title: proxy.title || '未命名模板', content: JSON.stringify({ page: proxy.dPage, widgets: proxy.dWidgets }), width: proxy.dPage.width, height: proxy.dPage.height })
       res.stat != 0 && useNotification('保存成功', '模板内容已变更')
     }
     // 停用启用
@@ -178,7 +170,7 @@ export default defineComponent({
               clearInterval(animation)
             }
           }, 800)
-          await _dl.downloadImg(api.home.download({ id, width, height }) + '&r=' + Math.random(), (progress: number, xhr: any) => {
+          await _dl.downloadImg(api.home.download_cw({ id, width, height }) + '&r=' + Math.random(), (progress: number, xhr: any) => {
             if (props.modelValue) {
               clearInterval(animation)
               progress >= timerCount && context.emit('change', { downloadPercent: Number(progress.toFixed(0)), downloadText: '图片生成中' })
@@ -203,34 +195,27 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapGetters(['dKeyword', 'dEditTemplateId', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory']),
-  },
-  mounted(){
-    const route = useRoute()
-    const { tempid, tempType: type } = route.query
-    this.$store.commit('setDEditTemplateId', tempid)
+    ...mapGetters(['dKeyword', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory']),
   },
   methods: {
-    ...mapActions(['setDKeyword', 'setDEditTemplateId','pushHistory', 'addGroup']),
+    ...mapActions(['setDKeyword', 'pushHistory', 'addGroup']),
     async load(id: any, tempId: any, type: any, cb: Function) {
       if (this.$route.name !== 'Draw') {
         await useFontStore.init() // 初始化加载字体
-      }
-      if(tempId){
-        this.dEditTemplateId = tempId
       }
       const apiName = tempId && !id ? 'template' : 'poster'
       if (!id && !tempId) {
         cb()
         return
       }
-      const { data: content, title, state, width, height, bizName, keyword  } = await api[apiName].get({ id: id || tempId})
+      const { data: content, title, state, width, height, bizName, keyword, templateId   } = await api[apiName].get({ id: id || tempId})
       if (content) {
         const data = JSON.parse(content)
         this.stateBollean = !!state
         this.title = title
         this.bizName = bizName
         this.$store.commit('setDKeyword', keyword) 
+        this.templateId = templateId
         this.$store.commit('setShowMoveable', false) // 清理掉上一次的选择框
         // this.$store.commit('setDWidgets', [])
         if (type == 1) {
@@ -249,6 +234,7 @@ export default defineComponent({
     draw() {
       return new Promise((resolve) => {
         this.$refs.canvasImage.createCover((imgUrl:any) => {
+          console.log("drawImgUrl:" , imgUrl)
           resolve(imgUrl)
         })
       })

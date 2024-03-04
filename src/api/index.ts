@@ -8,9 +8,15 @@
 import * as home from './home'
 import * as material from './material'
 import * as ai from './ai'
+import * as poster from './poster'
+import * as template from './template'
+import * as minio from './minio'
 
 export default {
   home,
   material,
   ai,
+  poster,
+  template,
+  minio
 }

@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-08-08 10:09:59
 -->
 <template>
-  <tool-tip title="免责声明" :width="340" :content="content">
+  <tool-tip title="注意" :width="340" :content="content">
     <div>
       <slot />
     </div>
@@ -20,7 +20,7 @@ import toolTip from '@/components/common/PopoverTip.vue'
 export default defineComponent({
   components: { toolTip },
   setup() {
-    const content = '本站为个人项目，所使用素材图片等均为网络收集而来，下载之作品仅供学习研究或欣赏目的而使用，无法提供商用授权哦。'
+    const content = '海报渲染时间较长，请耐心等待！'
     return {
       content,
     }

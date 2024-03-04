@@ -75,4 +75,10 @@ export default {
   // setDragInitData(state: Type.Object, data: any) {
   //   state.dDragInitData = data
   // },
+  setDEditTemplateId(state: Type.Object, e: any) {
+    state.dEditTemplateId = e
+  },
+  setDKeyword(state: Type.Object, e: any) {
+    state.dKeyword = e
+  },
 }

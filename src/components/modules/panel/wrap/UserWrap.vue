@@ -150,7 +150,7 @@ export default defineComponent({
       if (isPass) {
         await api.material.deleteMyWorks({ id: item.id })
         setTimeout(() => {
-          router.push({ path: '/home', query: {  }, replace: true })
+          router.push({ path: '/design', query: {  }, replace: true })
           loadDesign(true)
         }, 300);
       }

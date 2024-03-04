@@ -1,110 +1,100 @@
 <template>
-  <div id="page-design-index" ref="pageDesignIndex" class="page-design-bg-color">
-    <div :style="style" class="top-nav">
-      <div class="top-nav-wrap">
-        <div class="top-left">
-          <div class="name" @click="jump2home">{{ APP_NAME }}</div>
-          <div class="operation">
-            <div :class="['operation-item', { disable: !undoable }]" @click="undoable ? handleHistory('undo') : ''"><i class="iconfont icon-undo" /></div>
-            <div :class="['operation-item', { disable: !redoable }]" @click="redoable ? handleHistory('redo') : ''"><i class="iconfont icon-redo" /></div>
-          </div>
-          <el-tooltip effect="dark" content="标尺" placement="bottom">
-            <i style="font-size: 20px" class="icon sd-biaochi extra-operation" @click="changeLineGuides" />
-          </el-tooltip>
+  <el-container class="home_container" style="height:100%;width:100%;">
+    <!-- 头部区域 -->
+    <el-header style="with:100%">
+      <el-menu
+        style="width:100%"
+        mode="horizontal"
+        text-color="#fff"
+        background-color="#A82521"
+        active-text-color="#F2F2F2"
+        unique-opened
+        :collapse="isCollapse" 
+        :collapse-transition="false"
+        :router="true"
+        >
+        <el-menu-item index="/">
+          <img
+            style="width: 123px;"
+            :src="getLogoUrl()"
+            alt="CW logo"
+          />
+        </el-menu-item>
+        <div v-for="item in menulist" :key="item.id">
+          <el-subMenu v-if="item.children.length > 0" :index="item.id+1+''">
+            <!-- 一级菜单模板区域 -->
+            <template #title>
+              <el-icon :class="iconsObj[item.id]"></el-icon>
+              <span>{{item.authName}}</span>
+            </template>
+            <!-- 二级菜单 -->
+              <el-menu-item  v-for="subItem in item.children" :key="subItem.id" :index="subItem.path">
+                <template #title>
+                  <el-icon class="iconfont icon-thunderbolt"></el-icon>
+                  <span>{{subItem.authName}}</span>
+                </template>
+              </el-menu-item>
+          </el-subMenu>
+          <el-menu-item v-else :index="item.path" >
+            <el-icon :class="iconsObj[item.id]"></el-icon>
+            <span>{{item.authName}}</span>
+          </el-menu-item>
         </div>
-        <HeaderOptions ref="options" v-model="isContinue" @change="optionsChange" />
-      </div>
-    </div>
-    <div class="page-design-index-wrap">
-      <widget-panel></widget-panel>
-      <design-board class="page-design-wrap" pageDesignCanvasId="page-design-canvas">
-        <!-- 用于挡住画布溢出部分，因为使用overflow有bug -->
-        <div class="shelter" :style="{ width: Math.floor((dPage.width * dZoom) / 100) + 'px', height: Math.floor((dPage.height * dZoom) / 100) + 'px' }"></div>
-        <!-- 提供一个背景图层 -->
-        <div class="shelter-bg transparent-bg" :style="{ width: Math.floor((dPage.width * dZoom) / 100) + 'px', height: Math.floor((dPage.height * dZoom) / 100) + 'px' }"></div>
-      </design-board>
-      <style-panel></style-panel>
-    </div>
-    <!-- 标尺 -->
-    <line-guides :show="showLineGuides" />
-    <!-- 缩放控制 -->
-    <zoom-control ref="zoomControl" />
-    <!-- 右键菜单 -->
-    <right-click-menu />
-    <!-- 旋转缩放组件 -->
-    <Moveable />
-    <!-- 遮罩百分比进度条 -->
-    <ProgressLoading :percent="downloadPercent" :text="downloadText" cancelText="取消" @cancel="downloadCancel" @done="downloadPercent = 0" />
-  </div>
+      </el-menu>
+    </el-header>
+    
+    <!-- 页面主体区域 -->
+    <el-container style="height:100%;width:100%;overflow:auto">
+        <!-- 路由占位符 -->
+        <router-view></router-view>
+    </el-container>
+  </el-container>
 </template>
 
 <script lang="ts">
 import _config from '../config'
 import { defineComponent, reactive, toRefs } from 'vue'
 import { mapActions, mapGetters } from 'vuex'
-import RightClickMenu from '@/components/business/right-click-menu/RcMenu.vue'
-import Moveable from '@/components/business/moveable/Moveable.vue'
-import designBoard from '@/components/modules/layout/designBoard.vue'
-import zoomControl from '@/components/modules/layout/zoomControl.vue'
-import lineGuides from '@/components/modules/layout/lineGuides.vue'
-
-import shortcuts from '@/mixins/shortcuts'
-import wGroup from '@/components/modules/widgets/wGroup/wGroup.vue'
-import HeaderOptions from './components/HeaderOptions.vue'
-import ProgressLoading from '@/components/common/ProgressLoading/index.vue'
-
-const beforeUnload = function (e: any) {
-  const confirmationMessage = '系统不会自动保存您未修改的内容'
-  ;(e || window.event).returnValue = confirmationMessage // Gecko and Trident
-  return confirmationMessage // Gecko and WebKit
-}
 
 export default defineComponent({
   components: {
-    RightClickMenu,
-    Moveable,
-    HeaderOptions,
-    ProgressLoading,
-    designBoard,
-    zoomControl,
-    lineGuides,
   },
-  mixins: [shortcuts],
+  mixins: [],
   setup() {
-    !_config.isDev && window.addEventListener('beforeunload', beforeUnload)
-
     const state = reactive({
-      style: {
-        left: '0px',
+      menulist:[
+        {
+          id: 1,
+          path: "/welcome",
+          authName: "主页",
+          children: []
+        },
+        {
+          id: 2,
+          path: "/design",
+          authName: "设计",
+          children: []
+        }
+      ],
+      iconsObj: {
+        1: 'iconfont icon-home',
+        2: 'iconfont icon-skin',
+        3: 'iconfont icon-drag',
+        4: 'iconfont icon-thunderbolt',
+        5: 'iconfont icon-fire'
       },
-      // openDraw: false,
-      downloadPercent: 0, // 下载进度
-      downloadText: '',
-      isContinue: true,
-      APP_NAME: _config.APP_NAME,
-      showLineGuides: false,
+      // 是否折叠
+      isCollapse: false
     })
-    // const draw = () => {
-    //   state.openDraw = true
-    // }
-    function jump2home() {
-      // const fullPath = window.location.href.split('/')
-      // window.open(fullPath[0] + '//' + fullPath[2])
-      window.open('https://xp.palxp.cn/')
+    const getLogoUrl = () => {
+      return new URL(`../assets/image/cw_logo.png`, import.meta.url).href
     }
     return {
       ...toRefs(state),
-      jump2home,
+      getLogoUrl
     }
   },
   computed: {
-    ...mapGetters(['dActiveElement', 'dHistoryParams', 'dCopyElement', 'dPage', 'dZoom']),
-    undoable() {
-      return !(this.dHistoryParams.index === -1 || (this.dHistoryParams === 0 && this.dHistoryParams.length === this.dHistoryParams.maxLength))
-    },
-    redoable() {
-      return !(this.dHistoryParams.index === this.dHistoryParams.length - 1)
-    },
   },
   // watch: {
   //   $route() {
@@ -113,65 +103,66 @@ export default defineComponent({
   //   },
   // },
   mounted() {
-    this.initGroupJson(JSON.stringify(wGroup.setting))
-    window.addEventListener('scroll', this.fixTopBarScroll)
-    // window.addEventListener('click', this.clickListener)
-    document.addEventListener('keydown', this.handleKeydowm, false)
-    document.addEventListener('keyup', this.handleKeyup, false)
-    this.loadData()
   },
   beforeUnmount() {
-    window.removeEventListener('scroll', this.fixTopBarScroll)
-    // window.removeEventListener('click', this.clickListener)
-    document.removeEventListener('keydown', this.handleKeydowm, false)
-    document.removeEventListener('keyup', this.handleKeyup, false)
-    document.oncontextmenu = null
   },
   methods: {
-    ...mapActions(['selectWidget', 'initGroupJson', 'handleHistory']),
-    changeLineGuides() {
-      this.showLineGuides = !this.showLineGuides
+    logout () {
+      window.sessionStorage.clear()
+      this.$router.push('/login')
     },
-    downloadCancel() {
-      this.downloadPercent = 0
-      this.isContinue = false
-    },
-    loadData() {
-      // 初始化加载页面
-      const { id, tempid, tempType } = this.$route.query
-      ;(this.$refs as any).options.load(id, tempid, tempType, async () => {
-        ;(this.$refs as any).zoomControl.screenChange()
-        await this.$nextTick()
-        // 初始化激活的控件为page
-        this.selectWidget({
-          uuid: '-1',
-        })
-      })
-    },
-    zoomSub() {
-      ;(this.$refs as any).zoomControl.sub()
-    },
-    zoomAdd() {
-      ;(this.$refs as any).zoomControl.add()
-    },
-    save() {
-      ;(this.$refs as any).options.save()
-    },
-    fixTopBarScroll() {
-      const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
-      this.style.left = `-${scrollLeft}px`
-    },
-    clickListener(e) {
-      console.log('click listener', e)
-    },
-    optionsChange({ downloadPercent, downloadText }: any) {
-      this.downloadPercent = downloadPercent
-      this.downloadText = downloadText
+    // 点击按钮，切换菜单的折叠与展开
+    toggleCollapse () {
+      this.isCollapse = !this.isCollapse
     },
   },
 })
 </script>
 
 <style lang="less" scoped>
-@import url('@/assets/styles/design.less');
+.home_container {
+  height: 100%;
+}
+.el-menu {
+  width: 100%;
+}
+.el-header {
+  background-color: #363d40;
+  // 给头部设置一下弹性布局
+  // display: flex;
+  // 让它贴标左右对齐
+  // justify-content: space-between;
+  // 清空图片左侧padding
+  padding-left: 0;
+  padding-right: 0;
+  // 按钮居中
+  // align-items: center;
+  // 文本颜色
+  color: #fff;
+  font-weight: bold;
+  // 设置文本字体大小
+  font-size: 23px;
+  // 嵌套
+}
+.iconfont{
+  margin-right: 19px;
+}
+.toggle-button{
+ // 添加背景颜色
+ background-color: #4A5064;
+ // 设置文本大小
+ font-size:10px;
+ // 设置文本行高
+ line-height:24px;
+ // 设置文本颜色
+ color:#fff;
+ // 设置文本居中
+ text-align: center;
+ // 设置文本间距
+ letter-spacing: 0.2em;
+ // 设置鼠标悬浮变小手效果
+ cursor:pointer;
+}
+
+
 </style>
