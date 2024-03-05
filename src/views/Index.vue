@@ -126,8 +126,10 @@ export default defineComponent({
 .home_container .el-menu {
   width: 100%;
 }
+.home_container .el-menu--horizontal>.el-menu-item{
+  height: auto !important;
+}
 .home_container .el-header {
-  background-color: #363d40;
   // 给头部设置一下弹性布局
   // display: flex;
   // 让它贴标左右对齐
