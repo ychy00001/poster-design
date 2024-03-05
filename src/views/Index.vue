@@ -123,10 +123,10 @@ export default defineComponent({
 .home_container {
   height: 100%;
 }
-.el-menu {
+.home_container .el-menu {
   width: 100%;
 }
-.el-header {
+.home_container .el-header {
   background-color: #363d40;
   // 给头部设置一下弹性布局
   // display: flex;
@@ -144,10 +144,10 @@ export default defineComponent({
   font-size: 23px;
   // 嵌套
 }
-.iconfont{
+.home_container .iconfont{
   margin-right: 19px;
 }
-.toggle-button{
+.home_container .toggle-button{
  // 添加背景颜色
  background-color: #4A5064;
  // 设置文本大小

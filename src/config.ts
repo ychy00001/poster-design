@@ -8,8 +8,8 @@ export default {
   isDev,
   BASE_URL: isDev ? '/' : './',
   VERSION: version,
-  APP_NAME: '迅排设计',
-  COPYRIGHT: 'ShawnPhang - Palxp.cn',
+  APP_NAME: '云从AI海报',
+  COPYRIGHT: 'Cloudwalk - www.cloudwalk.com',
   // API_URL: isDev ? 'http://localhost:9998' : '${API}',
   API_URL: 'https://palxp.cn:8887', // 服务端地址
   POSTER_API_URL: isDev ? 'http://localhost:48080/app-api' : 'http://10.128.172.93:32001/app-api',
