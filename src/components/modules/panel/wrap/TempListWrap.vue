@@ -100,7 +100,7 @@ export default defineComponent({
     ...mapGetters(['tempEditing', 'dHistoryParams']),
   },
   methods: {
-    ...mapActions(['setDEditTemplateId','selectWidget', 'updatePageData', 'setTemplate', 'pushHistory']),
+    ...mapActions(['setDKeyword', 'setDEditTemplateId','selectWidget', 'updatePageData', 'setTemplate', 'pushHistory']),
     async selectItem(item: any) {
       this.$store.commit('setShowMoveable', false) // 清理掉上一次的选择框
       if (this.dHistoryParams.length > 0) {
@@ -112,7 +112,7 @@ export default defineComponent({
       this.$store.commit('managerEdit', false)
       this.$store.commit('setDWidgets', [])
 
-      this.setTempId(item.id)
+      this.setTempId(item.id, item.keyword)
 
       let result = null
       if (!item.data) {
@@ -158,9 +158,10 @@ export default defineComponent({
     // setTempStat({ id }: any, stat: string) {
     //   api.home.setTempStat({ id, stat })
     // },
-    setTempId(tempId: number | string) {
+    setTempId(tempId: number | string, keywords: string) {
       const { id } = this.$route.query
       this.$store.commit('setDEditTemplateId', tempId)
+      this.$store.commit('setDKeyword', keywords)
       this.$router.push({ path: '/design', query: { tempid: tempId, id }, replace: true })
     },
   },
