@@ -85,6 +85,7 @@ const all = {
     // dDragInitData: {}, // 拖拽初始化数据
     dEditTemplateId: -1,
     dKeyword: "",
+    dBizName: ""
   },
   getters: {
     selectItem(state: any) {
@@ -188,6 +189,9 @@ const all = {
     },
     dKeyword(state: any) {
       return state.dKeyword
+    },
+    dBizName(state: any) {
+      return state.dBizName
     },
   },
   mutations: {

@@ -52,8 +52,6 @@ export default defineComponent({
       stateBollean: false,
       title: '',
       loading: false,
-      bizName: '',
-      keyword: '',
       templateId: -1,
     })
 
@@ -195,7 +193,7 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapGetters(['dKeyword', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory']),
+    ...mapGetters(['dBizName', 'dKeyword', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory']),
   },
   methods: {
     ...mapActions(['setDKeyword', 'pushHistory', 'addGroup']),
@@ -213,8 +211,8 @@ export default defineComponent({
         const data = JSON.parse(content)
         this.stateBollean = !!state
         this.title = title
-        this.bizName = bizName
-        this.$store.commit('setDKeyword', keyword) 
+        this.$store.commit('setDBizName', bizName) 
+        this.$store.commit('setDKeyword', keyword)
         this.templateId = templateId
         this.$store.commit('setShowMoveable', false) // 清理掉上一次的选择框
         // this.$store.commit('setDWidgets', [])

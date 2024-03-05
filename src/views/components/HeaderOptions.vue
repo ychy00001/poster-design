@@ -54,7 +54,6 @@ export default defineComponent({
       stateBollean: false,
       title: '',
       loading: false,
-      bizName: '',
     })
 
     // 保存作品
@@ -113,7 +112,7 @@ export default defineComponent({
           { 
             id: tempid, 
             title: proxy.title || '未命名模板', 
-            bizName: proxy.bizName,
+            bizName: proxy.dBizName,
             keyword: proxy.dKeyword,
             cover: cover,
             data: JSON.stringify({ page: proxy.dPage, widgets: proxy.dWidgets }), 
@@ -125,7 +124,7 @@ export default defineComponent({
           res = await api.template.create(
           { 
             title: proxy.title || '未命名模板', 
-            bizName: proxy.bizName,
+            bizName: proxy.dBizName,
             keyword: proxy.dKeyword,
             cover: cover,
             data: JSON.stringify({ page: proxy.dPage, widgets: proxy.dWidgets }), 
@@ -133,8 +132,10 @@ export default defineComponent({
             height: proxy.dPage.height,
             status: 1
           })
-          this.$store.commit('setDEditTemplateId', res)
-          this.$router.push({ path: '/design', query: { tempid: res }, replace: true })
+          if (!res.code){
+            this.$store.commit('setDEditTemplateId', res)
+            this.$router.push({ path: '/design', query: { tempid: res }, replace: true })
+          }
         }
         context.emit('change', { downloadPercent: 100, downloadText: '保存完成' })
       }
@@ -203,7 +204,7 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapGetters(['dKeyword', 'dEditTemplateId', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory']),
+    ...mapGetters(['dBizName', 'dKeyword', 'dEditTemplateId', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory']),
   },
   mounted(){
     const route = useRoute()
@@ -229,7 +230,7 @@ export default defineComponent({
         const data = JSON.parse(content)
         this.stateBollean = !!state
         this.title = title
-        this.bizName = bizName
+        this.$store.commit('setDBizName', bizName) 
         this.$store.commit('setDKeyword', keyword) 
         this.$store.commit('setShowMoveable', false) // 清理掉上一次的选择框
         // this.$store.commit('setDWidgets', [])

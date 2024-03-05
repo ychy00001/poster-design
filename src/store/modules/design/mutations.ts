@@ -81,4 +81,7 @@ export default {
   setDKeyword(state: Type.Object, e: any) {
     state.dKeyword = e
   },
+  setDBziName(state: Type.Object, e: any) {
+    state.dBizName = e
+  },
 }
