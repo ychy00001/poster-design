@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-12-11 12:40:59
 -->
 <template>
-  <div class="top-title"><el-input v-model="title" placeholder="未命名的设计" class="input-wrap" /></div>
+  <div class="top-title"><el-input v-model="inputTitle" placeholder="未命名的设计" class="input-wrap" /></div>
   <div class="top-icon-wrap">
     <template v-if="tempEditing">
       <span style="color: #999; font-size: 14px; margin-right: 0.5rem">{{ stateBollean ? '启用' : '停用' }}</span> <el-switch v-model="stateBollean" @change="stateChange" />
@@ -52,7 +52,6 @@ export default defineComponent({
     const store = useStore()
     const state = reactive({
       stateBollean: false,
-      title: '',
       loading: false,
     })
 
@@ -107,11 +106,11 @@ export default defineComponent({
         const cover = await proxy?.draw()
         clearInterval(animation)
         context.emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
-        if(tempid && !isCreate){
+        if(proxy.dEditTemplateId > 0 && !isCreate){
           res = await api.template.update(
           { 
-            id: tempid, 
-            title: proxy.title || '未命名模板', 
+            id: proxy.dEditTemplateId, 
+            title: proxy.dTitle || '未命名模板', 
             bizName: proxy.dBizName,
             keyword: proxy.dKeyword,
             cover: cover,
@@ -123,7 +122,7 @@ export default defineComponent({
         }else{
           res = await api.template.create(
           { 
-            title: proxy.title || '未命名模板', 
+            title: proxy.dTitle|| '未命名模板', 
             bizName: proxy.dBizName,
             keyword: proxy.dKeyword,
             cover: cover,
@@ -204,7 +203,15 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapGetters(['dBizName', 'dKeyword', 'dEditTemplateId', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory']),
+    ...mapGetters(['dTitle', 'dBizName', 'dKeyword', 'dEditTemplateId', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory']),
+    inputTitle: {
+      get(){
+        return this.dTitle
+      },
+      set(value){
+        this.$store.commit('setDTitle', value) 
+      }
+    }
   },
   mounted(){
     const route = useRoute()
@@ -212,7 +219,7 @@ export default defineComponent({
     this.$store.commit('setDEditTemplateId', tempid)
   },
   methods: {
-    ...mapActions(['setDKeyword', 'setDEditTemplateId','pushHistory', 'addGroup']),
+    ...mapActions(['setDTitle', 'setDKeyword', 'setDEditTemplateId','pushHistory', 'addGroup']),
     async load(id: any, tempId: any, type: any, cb: Function) {
       if (this.$route.name !== 'Draw') {
         await useFontStore.init() // 初始化加载字体
@@ -230,6 +237,7 @@ export default defineComponent({
         const data = JSON.parse(content)
         this.stateBollean = !!state
         this.title = title
+        this.$store.commit('setDTitle', title) 
         this.$store.commit('setDBizName', bizName) 
         this.$store.commit('setDKeyword', keyword) 
         this.$store.commit('setShowMoveable', false) // 清理掉上一次的选择框

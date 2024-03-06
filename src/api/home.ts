@@ -11,6 +11,7 @@ import _config from '@/config'
 const screenshot_url = window.location.protocol + '//' + window.location.host + '/cw_draw'
 export const download = (params: Type.Object = {}) => `${_config.SCREEN_URL}/api/screenshots?id=${params.id}&width=${params.width}&height=${params.height}`
 export const download_cw = (params: Type.Object = {}) => `${_config.SCREEN_URL}/api/screenshots?id=${params.id}&width=${params.width}&height=${params.height}&screenshot_url=${screenshot_url}`
+export const create_cover_cw = (params: Type.Object = {}) => `${_config.SCREEN_URL}/api/screenshots?id=${params.id}&width=${params.width}&height=${params.height}&screenshot_url=${screenshot_url}&type=cover`
 
 // 获取模板列表
 export const getTempList = (params: Type.Object = {}) => fetch('design/list', params, 'get')

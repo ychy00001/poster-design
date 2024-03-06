@@ -173,7 +173,13 @@ export default defineComponent({
       store.commit('selectItem', { data: { value: item }, type: 'image' })
     }
     const uploadDone = async (res: any) => {
-      await api.material.addMyPhoto(res)
+      await api.material_new.create({
+        name: '我的资源',
+        type: 3,
+        value: res.url,
+        width: res.width,
+        height: res.height,
+      })
       state.imgList = []
       load(true)
     }

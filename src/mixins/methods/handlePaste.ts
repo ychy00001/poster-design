@@ -29,11 +29,15 @@ export default () => {
           const imageBlob = await item.getType(item.types[0])
           const file = new File([imageBlob], 'screenshot.png', { type: 'image/png' })
           // 上传图片
-          const qnOptions = { bucket: 'xp-design', prePath: 'user' }
-          const result: any = await Qiniu.upload(file, qnOptions)
+          const url: any = await api.minio.fileUpload(file)
           const { width, height }: any = await getImage(file)
-          const url = _config.IMG_URL + result.key
-          await api.material.addMyPhoto({ width, height, url })
+          await api.material_new.create({
+            name: '我的粘帖图片资源',
+            type: 6,
+            value: url,
+            width: width,
+            height: height,
+          })
           // 添加图片到画布中
           store.commit('setShowMoveable', false) // 清理掉上一次的选择
           const setting = JSON.parse(JSON.stringify(wImage.setting))

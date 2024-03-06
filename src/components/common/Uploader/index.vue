@@ -17,6 +17,7 @@
 import { defineComponent, onMounted, nextTick } from 'vue'
 import { ElUpload } from 'element-plus'
 import Qiniu from '@/common/methods/QiNiu'
+import api from '@/api'
 import { getImage } from '@/common/methods/getImgDetail'
 import _config from '@/config'
 import useNotification from '@/common/methods/notification'
@@ -46,13 +47,13 @@ export default defineComponent({
     let tempSimpleRes: any = null // 单个文件上传时返回
 
     onMounted(async () => {
-      await nextTick()
-      setTimeout(() => {
-        // 加载七牛上传插件
-        const link_element = document.createElement('script')
-        link_element.setAttribute('src', _config.QINIUYUN_PLUGIN)
-        document.head.appendChild(link_element)
-      }, 1000)
+      // await nextTick()
+      // setTimeout(() => {
+      //   // 加载七牛上传插件
+      //   const link_element = document.createElement('script')
+      //   link_element.setAttribute('src', _config.QINIUYUN_PLUGIN)
+      //   document.head.appendChild(link_element)
+      // }, 1000)
     })
 
     const upload = ({ file }: any) => {
@@ -72,12 +73,16 @@ export default defineComponent({
         uploading = true
         const file = uploadList[0]
         if (file) {
-          if (file.size <= 1024 * 1024) {
-            tempSimpleRes = await qiNiuUpload(file) // 队列有文件，执行上传
-            const { width, height }: any = await getImage(file)
-            useNotification('上传成功', '公共测试账户，上传请注意保护隐私哦!', { position: 'bottom-left' })
-            context.emit('done', { width, height, url: _config.IMG_URL + tempSimpleRes.key }) // 单个文件进行响应
-          } else useNotification('爱护小水管', '请上传小于 1M 的图片哦!', { type: 'error', position: 'bottom-left' })
+          if (file.size <= 1024 * 2048) {
+            const imageUrl = await minioUpload(file) // 队列有文件，执行上传
+            if(imageUrl === null){
+              useNotification('出错了', '文件服务器异常，请联系管理员!', { type: 'error', position: 'bottom-left' })
+            }else{
+              const { width, height }: any = await getImage(file)
+              useNotification('上传成功', '', { position: 'bottom-left' })
+              context.emit('done', { width, height, url: imageUrl }) // 单个文件进行响应
+            }
+          } else useNotification('爱护小水管', '请上传小于 2M 的图片哦!', { type: 'error', position: 'bottom-left' })
           uploading = false
           handleRemove() // 移除已上传文件
           index++
@@ -92,15 +97,15 @@ export default defineComponent({
         }
       }
     }
-    const qiNiuUpload = async (file: File) => {
+    const minioUpload = async (file: File) => {
       updatePercent(0)
       return new Promise(async (resolve: Function) => {
         if (props.hold) {
           context.emit('load', file)
           resolve()
         } else {
-          const result: any = await Qiniu.upload(file, props.options, (res: Type.Object) => {
-            updatePercent(res.total.percent)
+          const result: any = await api.minio.fileUpload(file, (res) => {
+            updatePercent(res)
           })
           resolve(result)
         }

@@ -43,7 +43,7 @@ export default defineComponent({
       options = {
         width: props.width,
         height: props.height,
-        type: 'canvas' as DrawType, // canvas svg
+        type: 'svg' as DrawType, // canvas svg
         data: props.value,
         image: props.image, // /favicon.svg
         margin: 0,

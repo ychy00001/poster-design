@@ -36,11 +36,9 @@ export default defineComponent({
       }
       setTimeout(async () => {
         const clonePage: HTMLElement = document.getElementById('page-design-canvas')?.cloneNode(true)
-        console.log(clonePage)
         clonePage.setAttribute('id', 'clone-page')
         document.body.appendChild(clonePage)
         html2canvas(document.getElementById('clone-page'), opts).then((canvas: any) => {
-          document.body.appendChild(canvas);
           canvas.toBlob(
             async (blobObj: Blob) => {
               // console.log(blobObj)
@@ -54,25 +52,21 @@ export default defineComponent({
               const uploadName = uuid(8,16) + ".jpeg"
               // console.log("uploadCoverName: %s", uploadName)
               // 上传至Minio
-              const {preSignedUrl, imgUrl} = await api.minio.genPreSignedURL({
-                objectName: uploadName
-              })
-              console.log("preSignedUrl: %s, imgUrl: %s", preSignedUrl,imgUrl)
               const file = new File([blobObj], uploadName, {type: 'image/jpeg'})
-              const result = await api.minio.fileUploadWithPresigned(preSignedUrl,file)
-              if(result == ""){
-                cb(imgUrl)
+              const result = await api.minio.fileUpload(file)
+              if(result){
+                cb(result)
               }else{
                 cb(null)
               }
             },
             'image/jpeg',
-            0.3,
+            0.7,
           )
           proxy?.updateZoom(nowZoom)
           clonePage.remove()
         })
-      }, 10)
+      }, 100)
     }
 
     return {

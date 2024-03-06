@@ -68,7 +68,7 @@ export default {
       mode: '颜色',
       modes: ['颜色', '图片'],
       showBgLib: false,
-      keyword: ''
+      keyword: '',
     }
   },
   computed: {
@@ -145,13 +145,19 @@ export default {
         pushHistory: true,
       })
     },
-    async uploadImgDone(img) {
-      await api.material.addMyPhoto(img)
+    async uploadImgDone(imgResource) {
+      await api.material_new.create({
+        name: '我的背景',
+        type: 1,
+        value: imgResource.url,
+        width: imgResource.width,
+        height: imgResource.height,
+      })
       this.updatePageData({
         key: 'backgroundTransform',
         value: {},
       })
-      this.finish('backgroundImage', img.url)
+      this.finish('backgroundImage', imgResource.url)
     },
     async deleteBg() {
       this._localTempBG = null

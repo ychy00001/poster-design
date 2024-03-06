@@ -167,7 +167,13 @@ export default {
     },
     async uploadImgDone(img) {
       this.$store.commit('setShowMoveable', false)
-      await api.material.addMyPhoto(img)
+      await api.material_new.create({
+        name: '我的二维码组件',
+        type: 5,
+        value: img.url,
+        width: img.width,
+        height: img.height,
+      })
       // this.innerElement.width = img.width
       // this.innerElement.height = img.height * (this.innerElement.width / img.width)
       this.innerElement.url = img.url

@@ -20,14 +20,15 @@
         <toggle-switch v-model="innerElement.isAI" label="AI填充" @finish="(value) => finishAIToggle('isAI', value)" />
         <toggle-switch v-model="innerElement.isSegmentation" label="抠图填充" @finish="(value) => finishAIToggle('isSegmentation', value)" />
         <!-- <el-button size="mini" style="width: 100%; margin-top: 0.5rem" plain @click="openCropper">替换图片</el-button> -->
-        <el-button style="width: 100%; margin-bottom: 12px" plain @click="openPicBox">替换图片</el-button>
+        <el-button style="width: 100%; margin-bottom: 12px" plain @click="openPicBox">图库选择</el-button>
+        <uploader style="width: 100%; margin-bottom: 12px" class="options__upload" @done="uploadImgDone">
+          <el-button plain>上传图片</el-button>
+        </uploader>
         <div class="options">
           <el-button v-if="innerElement.cropEdit" plain type="primary" @click="imgCrop(false)">完成</el-button>
           <el-button v-else plain type="primary" @click="imgCrop(true)"><i class="icon sd-caijian" /> 裁剪</el-button>
           <el-button plain @click="openImageCutout"><i class="icon sd-AIkoutu" /> 抠图</el-button>
-          <!-- <uploader class="options__upload" @done="uploadImgDone">
-            <el-button size="small" plain>替换图片</el-button>
-          </uploader> -->
+          
           <el-button size="small" disabled plain @click="openCropper">美化</el-button>
         </div>
         <!-- <container-wrap @change="changeContainer" />
@@ -237,7 +238,13 @@ export default {
     },
     async uploadImgDone(img) {
       this.$store.commit('setShowMoveable', false)
-      await api.material.addMyPhoto(img)
+      await api.material_new.create({
+        name: '我的图片组件',
+        type: 4,
+        value: img.url,
+        width: img.width,
+        height: img.height,
+      })
       // this.innerElement.width = img.width
       this.innerElement.height = img.height * (this.innerElement.width / img.width)
       this.innerElement.imgUrl = img.url

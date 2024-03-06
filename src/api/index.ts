@@ -10,6 +10,7 @@ import * as material from './material'
 import * as ai from './ai'
 import * as poster from './poster'
 import * as template from './template'
+import * as material_new from './material_new'
 import * as minio from './minio'
 
 export default {
@@ -18,5 +19,6 @@ export default {
   ai,
   poster,
   template,
+  material_new,
   minio
 }

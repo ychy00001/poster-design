@@ -7,34 +7,52 @@
  */
 import cw_fetch from '@/utils/cw_axios'
 import axios from 'axios'
+import {uuid} from '@/utils/utils'
 
 const upload_axios = axios.create({})
 
 upload_axios.defaults.timeout = 30000
 
 // 上传接口  uploadName : xxx/xxx.png
-export const fileUpload = (file: File, uploadName: string) => {
-  console.log(file)
-  const PreSignedPromise = genPreSignedURL({
+export const fileUpload = async (file: File, cb?: Function) => {
+  const uploadName = uuid(8,16)+"_"+file.name
+  const preSignedResult = await genPreSignedURL({
     objectName: uploadName
   })
-  PreSignedPromise.then((result:any)=>{
-    console.log(result)
-    const preSignedUrl = result.preSignedUrl
-    const imgUrl = result.imgUrl
-    const remoteFilePromise = fileUploadWithPresigned(preSignedUrl,file)
-    remoteFilePromise.then((remoteObj:any)=>{
-      return imgUrl;
-    })
-  })
+  if(!preSignedResult.code){
+    const preSignedUrl = preSignedResult.preSignedUrl
+    const imgUrl = preSignedResult.imgUrl
+    
+    const remoteFilePromise = await fileUploadWithPresigned(preSignedUrl,file, cb)
+    return Promise.resolve(imgUrl);
+  }
   return null
 }
 
 // 根据预签名文件上传
-export const fileUploadWithPresigned = (presignedUrl: string, file: File) => {
-  return cw_fetch(presignedUrl, file, 'put', {
-    "Content-Type": "image/jpeg",
-  })
+export const fileUploadWithPresigned = (presignedUrl: string, file: File, cb?:Function) => {
+  const extra = {
+    responseType: 'blob',
+    onUploadProgress: (progress: any) => {
+      if(cb){
+        cb(Math.floor((progress.loaded / progress.total) * 100), 0)
+      }
+    },
+    onDownloadProgress: (progress: any) => {
+      if(cb){
+        cb(100, Math.floor((progress.loaded / progress.total) * 100))
+      }
+    },
+  }
+  if(cb){
+    return cw_fetch(presignedUrl, file, 'put', {
+      "Content-Type": "image/jpeg",
+    }, extra)
+  }else{
+    return cw_fetch(presignedUrl, file, 'put', {
+      "Content-Type": "image/jpeg",
+    })
+  }
 }
 
 // export const fileUploadWithPresigned = (presignedUrl: string, file: File) => {

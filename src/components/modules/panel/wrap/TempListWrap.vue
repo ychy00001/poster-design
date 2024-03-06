@@ -100,7 +100,7 @@ export default defineComponent({
     ...mapGetters(['tempEditing', 'dHistoryParams']),
   },
   methods: {
-    ...mapActions(['setDBziName', 'setDKeyword', 'setDEditTemplateId','selectWidget', 'updatePageData', 'setTemplate', 'pushHistory']),
+    ...mapActions(['setDBizName', 'setDKeyword', 'setDEditTemplateId','selectWidget', 'updatePageData', 'setTemplate', 'pushHistory']),
     async selectItem(item: any) {
       this.$store.commit('setShowMoveable', false) // 清理掉上一次的选择框
       if (this.dHistoryParams.length > 0) {
@@ -112,7 +112,7 @@ export default defineComponent({
       this.$store.commit('managerEdit', false)
       this.$store.commit('setDWidgets', [])
 
-      this.setTempId(item.id, item.keyword, item.bizName)
+      this.setTempId(item.id, item.keyword, item.bizName, item.title)
 
       let result = null
       if (!item.data) {
@@ -122,7 +122,6 @@ export default defineComponent({
         result = JSON.parse(item.data)
       }
       const { page, widgets } = result
-      console.log(widgets)
 
       this.$store.commit('setDPage', page)
       this.setTemplate(widgets)
@@ -158,11 +157,12 @@ export default defineComponent({
     // setTempStat({ id }: any, stat: string) {
     //   api.home.setTempStat({ id, stat })
     // },
-    setTempId(tempId: number | string, keywords: string, bizName: string) {
+    setTempId(tempId: number | string, keywords: string, bizName: string, title: string) {
       const { id } = this.$route.query
       this.$store.commit('setDEditTemplateId', tempId)
       this.$store.commit('setDKeyword', keywords)
-      this.$store.commit('setDBziName', bizName)
+      this.$store.commit('setDBizName', bizName)
+      this.$store.commit('setDTitle', title)
       this.$router.push({ path: '/design', query: { tempid: tempId, id }, replace: true })
     },
   },

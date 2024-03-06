@@ -146,11 +146,15 @@ export default defineComponent({
       const buffer = await response.arrayBuffer()
       const file = new File([buffer], `cut_image_${Math.random()}.png`)
       // upload
-      const qnOptions = { bucket: 'xp-design', prePath: 'user' }
-      const result = await Qiniu.upload(file, qnOptions)
+      const url: any = await api.minio.fileUpload(file)
       const { width, height } = await getImage(file)
-      const url = _config.IMG_URL + result.key
-      await api.material.addMyPhoto({ width, height, url })
+      await api.material_new.create({
+        name: '我的抠图',
+        type: 2,
+        value: url,
+        width,
+        height,
+      })
       emit('done', url)
       state.show = false
       handleClose()
