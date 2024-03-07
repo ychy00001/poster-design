@@ -4,7 +4,7 @@
       <design-board class="page-design-wrap fixed-canvas" pageDesignCanvasId="page-design-canvas"></design-board>
     </div>
     <!-- 缩放控制 -->
-    <zoom-control />
+    <zoom-control ref="zoomControl" />
   </div>
 </template>
 
@@ -46,7 +46,12 @@ export default defineComponent({
     ...mapActions(['initGroupJson', 'setTemplate', 'addGroup']),
     async load() {
       let loadFlag = false
-      const { id, tempid, tempType: type } = this.$route.query
+      const { id, tempid, tempType: type, isCover } = this.$route.query
+      if(isCover){
+        ;(this.$refs as any).zoomControl.selectItem(7)
+      }else{
+        ;(this.$refs as any).zoomControl.selectItem(3)
+      }
       if (id || tempid) {
         const apiName = tempid && !id ? 'template' : 'poster'
         const { data, width, height } = await await api[apiName].get({ id: id || tempid})

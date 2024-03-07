@@ -150,6 +150,8 @@ export default {
     if (this.$route.path === '/draw') {
       this.activezoomIndex = 3
       this.hideControl = true
+    }else if (this.$route.path === '/cw_draw') {
+      this.hideControl = true
     } else {
       this.activezoomIndex = this.zoomList.length - 1
     }

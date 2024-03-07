@@ -49,12 +49,12 @@ const saveScreenshot = async (url: string, { path, width, height, thumbPath, siz
     const page = await browser.newPage()
     // 设置浏览器视窗
     function limiter(w: number, h: number) {
-      return w*h < maxPXs ? 1 : +(1/(w*h) * maxPXs).toFixed(2)
+      return w*h < maxPXs ? 1 : Number((1/(w*h) * maxPXs).toFixed(2))
     }
     page.setViewport({
       width: Number(width) > maximum ? 5000 : Number(width),
       height: Number(height) > maximum ? 5000 : Number(height),
-      deviceScaleFactor: !isNaN(scale) ? (+scale > 4 ? 4 : +scale) : limiter(Number(width), Number(height)),
+      deviceScaleFactor: !isNaN(scale) ? (Number(scale) > 4 ? 4 : Number(scale)) : limiter(Number(width), Number(height)),
     })
     ua && page.setUserAgent(ua)
     if (devices) {
@@ -98,8 +98,8 @@ const saveScreenshot = async (url: string, { path, width, height, thumbPath, siz
       try {
         thumbPath &&
           images(path)
-            .size(+size || 300)
-            .save(thumbPath, { quality: +quality || 70 })
+            .size(Number(size) || 300)
+            .save(thumbPath, { quality: Number(quality) || 70 })
       } catch (err) {
         console.log(err)
       }
