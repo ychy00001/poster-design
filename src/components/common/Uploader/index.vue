@@ -73,7 +73,7 @@ export default defineComponent({
         uploading = true
         const file = uploadList[0]
         if (file) {
-          if (file.size <= 1024 * 4096) {
+          if (file.size <= 1024 * 5120) {
             const imageUrl = await minioUpload(file) // 队列有文件，执行上传
             if(imageUrl === null){
               useNotification('出错了', '文件服务器异常，请联系管理员!', { type: 'error', position: 'bottom-left' })
@@ -82,7 +82,7 @@ export default defineComponent({
               useNotification('上传成功', '', { position: 'bottom-left' })
               context.emit('done', { width, height, url: imageUrl }) // 单个文件进行响应
             }
-          } else useNotification('爱护小水管', '请上传小于 4M 的图片哦!', { type: 'error', position: 'bottom-left' })
+          } else useNotification('爱护小水管', '请上传小于 5M 的图片哦!', { type: 'error', position: 'bottom-left' })
           uploading = false
           handleRemove() // 移除已上传文件
           index++
