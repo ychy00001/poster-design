@@ -70,7 +70,7 @@ import numberSlider from '../../settings/numberSlider.vue'
 // import textInput from '../../settings/textInput.vue'
 // import CropImage from '@/components/business/cropper/CropImage.vue'
 // import ContainerWrap from '../../settings/EffectSelect/ContainerWrap.vue'
-// import uploader from '@/components/common/Uploader/index.vue'
+import uploader from '@/components/common/Uploader/index.vue'
 import { getImage } from '@/common/methods/getImgDetail'
 import api from '@/api'
 import layerIconList from '@/assets/data/LayerIconList'
@@ -80,7 +80,7 @@ import imageCutout from '@/components/business/image-cutout'
 
 export default {
   name: NAME,
-  components: { toggleSwitch, numberInput, numberSlider, iconItemSelect, picBox, imageCutout },
+  components: { uploader, toggleSwitch, numberInput, numberSlider, iconItemSelect, picBox, imageCutout },
   data() {
     return {
       picBoxShow: false,
@@ -315,9 +315,15 @@ export default {
 .options {
   margin-bottom: 0.7rem;
   &__upload {
-    width: auto;
-    margin-left: 10px;
+    width: 100%;
+    // margin-left: 10px;
     display: inline-block;
+    .el-upload--text {
+      width: 100% !important;
+    }
+    .el-button{
+      width: 100%;
+    }
   }
   .icon {
     margin-right: 0.3em;

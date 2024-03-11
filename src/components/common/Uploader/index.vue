@@ -133,5 +133,6 @@ export default defineComponent({
 <style lang="less" scoped>
 :deep(.el-upload) {
   display: inherit;
+  width: 100%;
 }
 </style>
