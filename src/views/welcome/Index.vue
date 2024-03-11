@@ -41,7 +41,7 @@
                 </div>
                 <template #tip>
                   <div class="el-upload__tip">
-                    请上传小于2MB的jpg/png图片
+                    请上传小于4MB的jpg/png图片
                   </div>
                 </template>
               </el-upload>
@@ -156,9 +156,8 @@ export default defineComponent({
       if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
         ElMsg.error('图片必须是JPG或PNG格式!')
         return false
-      } else if (rawFile.size / 1024 / 1024 > 2) {
-        console.log("aaa")
-        ElMsg.error('图片大小不能超过2MB!')
+      } else if (rawFile.size / 1024 / 1024 > 4) {
+        ElMsg.error('图片大小不能超过4MB!')
         return false
       }
       return true

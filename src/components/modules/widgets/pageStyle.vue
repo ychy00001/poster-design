@@ -9,6 +9,9 @@
     <el-collapse v-else v-model="activeNames">
       <el-collapse-item title="元数据" name="1">
         <div class="position-size">
+          <text-select v-model="bizName" :options="bizNameOptions" label="类型" @finish="(value) => changeBizName(value)"  />
+        </div>
+        <div class="position-size">
           <text-input-area v-model="keyword" label="关键词" :max="100" @finish="(value) => changeKeyword(value)" />
         </div>
       </el-collapse-item>
@@ -46,6 +49,7 @@ const NAME = 'page-style'
 import { mapGetters, mapActions } from 'vuex'
 import numberInput from '../settings/numberInput.vue'
 import textInputArea from '../settings/textInputArea.vue'
+import textSelect from '../settings/textSelect.vue'
 import toggleSwitch from '../settings/toggleSwitch.vue'
 import colorSelect from '../settings/colorSelect.vue'
 import uploader from '@/components/common/Uploader/index.vue'
@@ -57,7 +61,7 @@ import TabPanel from '@palxp/color-picker/comps/TabPanel.vue'
 
 export default {
   name: NAME,
-  components: { toggleSwitch, textInputArea, numberInput, colorSelect, uploader, Tabs, TabPanel },
+  components: { textSelect, toggleSwitch, textInputArea, numberInput, colorSelect, uploader, Tabs, TabPanel },
   data() {
     return {
       activeNames: ['1', '2', '3', '4'],
@@ -69,10 +73,17 @@ export default {
       modes: ['颜色', '图片'],
       showBgLib: false,
       keyword: '',
+      bizName: '',
+      bizNameOptions: [
+        {
+          value: '食品',
+          label: '食品'
+        }
+      ]
     }
   },
   computed: {
-    ...mapGetters(['dKeyword','dActiveElement']),
+    ...mapGetters(['dBizName', 'dKeyword','dActiveElement']),
   },
   watch: {
     dActiveElement: {
@@ -92,7 +103,7 @@ export default {
     this.change()
   },
   methods: {
-    ...mapActions(['updatePageData', 'setDKeyword']),
+    ...mapActions(['updatePageData', 'setDKeyword', 'setDBizName']),
     colorChange(e) {
       if (e.mode === '渐变') {
         // setTimeout(() => {
@@ -112,6 +123,7 @@ export default {
     },
     change() {
       this.keyword = this.dKeyword
+      this.bizName = this.dBizName
       this.mode = this.modes[0]
       this.tag = true
       this.innerElement = JSON.parse(JSON.stringify(this.dActiveElement))
@@ -119,6 +131,9 @@ export default {
     },
     changeKeyword(value){
       this.$store.commit('setDKeyword', value) 
+    },
+    changeBizName(value){
+      this.$store.commit('setDBizName', value) 
     },
     changeValue() {
       if (this.tag) {

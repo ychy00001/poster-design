@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-12-11 12:40:59
 -->
 <template>
-  <div class="top-title"><el-input v-model="inputTitle" placeholder="未命名的设计" class="input-wrap" /></div>
+  <div class="top-title"><span style="color:#444444">标题：</span><el-input v-model="inputTitle" label="标题" placeholder="未命名的设计" class="input-wrap" /></div>
   <div class="top-icon-wrap">
     <template v-if="tempEditing">
       <span style="color: #999; font-size: 14px; margin-right: 0.5rem">{{ stateBollean ? '启用' : '停用' }}</span> <el-switch v-model="stateBollean" @change="stateChange" />
@@ -18,7 +18,7 @@
     <!-- <el-button @click="draw">绘制(测试)</el-button> -->
     <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false)">保存模板</el-button>
     <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true)">另存模板</el-button>
-    <el-button v-else :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true)">新建模板</el-button>
+    <el-button v-else :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true)">保存模版</el-button>
     <copyRight>
       <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" plain type="primary" @click="download">下载作品</el-button>
     </copyRight>
