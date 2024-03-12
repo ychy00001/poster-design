@@ -126,11 +126,29 @@ export default defineComponent({
           // console.log(e)
         }
         loadFlag = true
+
+        
+
         console.log('--> now u can start screenshot!')
         setTimeout(() => {
           try {
+            // 设置标识服务端截图 playwright
+            let pageDesignDom = document.getElementById('page-design-index')
+            let finishDom = document.createElement('p');
+            finishDom.id="finishLoad"
+            finishDom.style.width = '0px';
+            finishDom.style.height = '0px';
+            finishDom.style.position = "absolute";
+            finishDom.style.display = "inline";
+            pageDesignDom?.appendChild(finishDom)
+            console.log('--> finish load!')
+
+            // 设置标识puppeteer截图
             ;(window as any).loadFinishToInject('done')
-          } catch (err) {}
+
+          } catch (err) {
+            console.log(err)
+          }
         }, 100)
       }
       // 超时
