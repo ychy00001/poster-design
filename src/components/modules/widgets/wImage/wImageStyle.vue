@@ -24,6 +24,9 @@
         <uploader style="width: 100%; margin-bottom: 12px" class="options__upload" @done="uploadImgDone">
           <el-button plain>上传图片</el-button>
         </uploader>
+        <uploader style="width: 100%; margin-bottom: 12px" class="options__upload" @done="uploadMaskDone">
+          <el-button plain>上传蒙版</el-button>
+        </uploader>
         <div class="options">
           <el-button v-if="innerElement.cropEdit" plain type="primary" @click="imgCrop(false)">完成</el-button>
           <el-button v-else plain type="primary" @click="imgCrop(true)"><i class="icon sd-caijian" /> 裁剪</el-button>
@@ -248,6 +251,19 @@ export default {
       // this.innerElement.width = img.width
       this.innerElement.height = img.height * (this.innerElement.width / img.width)
       this.innerElement.imgUrl = img.url
+      this.$store.commit('setShowMoveable', true)
+    },
+    async uploadMaskDone(img) {
+      this.$store.commit('setShowMoveable', false)
+      await api.material_new.create({
+        name: '我的蒙版',
+        type: 7,
+        value: img.url,
+        width: img.width,
+        height: img.height,
+      })
+      // this.innerElement.width = img.width
+      this.innerElement.mask = img.url
       this.$store.commit('setShowMoveable', true)
     },
     selectDone(img) {

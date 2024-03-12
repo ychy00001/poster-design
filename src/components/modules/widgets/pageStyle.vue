@@ -31,12 +31,12 @@
         <!-- <bg-img-select :img="innerElement.backgroundImage"/> -->
         <div v-if="mode === '图片' && innerElement.backgroundImage" style="margin-top: 2rem">
           <el-image style="max-height: 428px" :src="innerElement.backgroundImage" fit="contain"></el-image>
-          <el-button class="btn-wrap" size="small" @click="deleteBg">删除</el-button>
+          <el-button class="btn-wrap"  @click="deleteBg">删除</el-button>
         </div>
         <uploader v-show="mode === '图片'" class="btn-wrap" @done="uploadImgDone">
           <el-button style="width: 100%" plain>{{ innerElement.backgroundImage ? '更换背景' : '上传背景' }}图</el-button>
         </uploader>
-        <el-button v-show="mode === '图片' && innerElement.backgroundImage" class="btn-wrap" size="small" @click="downloadBG">{{ downP ? downP + ' %' : '下载背景图' }}</el-button>
+        <el-button v-show="mode === '图片' && innerElement.backgroundImage" class="btn-wrap"  @click="downloadBG">{{ downP ? downP + ' %' : '下载背景图' }}</el-button>
 
       </el-collapse-item>
     </el-collapse>
