@@ -48,6 +48,11 @@
             </el-form-item>
           </el-col>
           <el-col :xs="8" :sm="12" :md="18" :lg="18" :xl="18" >
+            <el-form-item label="是否抠图" prop="isSegmentation">
+                <el-switch v-model="formInfo.isSegmentation" />
+            </el-form-item>
+          </el-col>
+          <el-col :xs="8" :sm="12" :md="18" :lg="18" :xl="18" >
             <el-form-item>
               <el-button type="primary" :disabled="!isGenerateFinish" @click="submitForm(ruleFormRef)"
                 >生成</el-button
@@ -99,6 +104,7 @@ export default defineComponent({
         bizName: '',
         keyword: '',
         imageUrl: '',
+        isSegmentation: false,
       },
       generateList: [],
       isGenerateFinish: true,

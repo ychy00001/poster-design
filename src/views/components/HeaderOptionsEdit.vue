@@ -16,7 +16,7 @@
       <div class="divide__line">|</div>
     </template>
     <!-- <el-button @click="draw">绘制(测试)</el-button> -->
-    <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="save(true)">保存</el-button>
+    <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="save(true, true)">保存</el-button>
     <copyRight>
       <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" plain type="primary" @click="download">下载作品</el-button>
     </copyRight>
@@ -56,7 +56,7 @@ export default defineComponent({
     })
 
     // 保存作品
-    async function save(hasCover: boolean = false) {
+    async function save(hasCover: boolean = false, isProcess: boolean) {
       if (state.loading === true) {
         return
       }
@@ -70,26 +70,34 @@ export default defineComponent({
       // console.log(proxy?.dPage, proxy?.dWidgets)
       const { id, tempid } = route.query
 
-      context.emit('update:modelValue', true)
-      context.emit('change', { downloadPercent: 1, downloadText: '正在生成封面' })
+      if(isProcess){
+        context.emit('update:modelValue', true)
+        context.emit('change', { downloadPercent: 1, downloadText: '正在生成封面' })
+      }
 
       let timerCount = 0
       const animation = setInterval(() => {
         if (props.modelValue && timerCount < 75) {
           timerCount += RandomNumber(1, 10)
-          context.emit('change', { downloadPercent: 1 + timerCount, downloadText: '正在合成图片' })
+          if(isProcess){
+            context.emit('change', { downloadPercent: 1 + timerCount, downloadText: '正在合成图片' })
+          }
         } else {
           clearInterval(animation)
         }
       }, 800)
       const cover = hasCover ? await proxy?.draw() : undefined
-      clearInterval(animation)
+      if(isProcess){
+        clearInterval(animation)
+      }
       console.log("generateCover:", cover)
       const widgets = proxy.dWidgets // reviseData()
-      context.emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
+      if(isProcess){
+        context.emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
+      }
       const updateResult = await api.poster.update({ id, 
           title: proxy.title || '未命名设计', 
-          bizName: proxy.bizName,
+          bizName: proxy.dBizName,
           keyword: proxy.dKeyword,
           templateId: proxy.templateId, 
           cover, 
@@ -98,7 +106,9 @@ export default defineComponent({
           height: proxy.dPage.height,
           status: 1
       })
-      context.emit('change', { downloadPercent: 100, downloadText: '保存完成' })
+      if(isProcess){
+        context.emit('change', { downloadPercent: 100, downloadText: '保存完成' })
+      }
 
       if(!updateResult.code){
         useNotification('保存成功', '可在"我的作品"中查看')
@@ -151,7 +161,7 @@ export default defineComponent({
       state.loading = true
       context.emit('update:modelValue', true)
       context.emit('change', { downloadPercent: 1, downloadText: '正在处理封面' })
-      await save(true)
+      await save(true, false)
       setTimeout(async () => {
         const { id } = route.query
         if (id) {

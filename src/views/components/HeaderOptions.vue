@@ -16,9 +16,9 @@
       <div class="divide__line">|</div>
     </template>
     <!-- <el-button @click="draw">绘制(测试)</el-button> -->
-    <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false)">保存模板</el-button>
-    <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true)">另存模板</el-button>
-    <el-button v-else :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true)">保存模版</el-button>
+    <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false, true)">保存模板</el-button>
+    <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true, true)">另存模板</el-button>
+    <el-button v-else :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true,true)">保存模版</el-button>
     <copyRight>
       <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" plain type="primary" @click="download">下载作品</el-button>
     </copyRight>
@@ -72,7 +72,7 @@ export default defineComponent({
       store.commit('setShowMoveable', true)
     }
     // 保存模板
-    async function saveTemp(isCreate:boolean) {
+    async function saveTemp(isCreate:boolean, showProcess: boolean) {
       const { tempid, tempType: type } = route.query
       let res = null
       if (type == 1) {
@@ -91,21 +91,27 @@ export default defineComponent({
         }
         res = await api.home.saveTemp({ id: tempid, type, title: proxy.title || '未命名组件', content: JSON.stringify(proxy.dWidgets), width: proxy.dPage.width, height: proxy.dPage.height })
       } else {
-        context.emit('update:modelValue', true)
-        context.emit('change', { downloadPercent: 1, downloadText: '正在生成封面' })
+        if(showProcess){
+          context.emit('update:modelValue', true)
+          context.emit('change', { downloadPercent: 1, downloadText: '正在生成封面' })
+        }
 
         let timerCount = 0
         const animation = setInterval(() => {
           if (props.modelValue && timerCount < 75) {
             timerCount += RandomNumber(1, 10)
-            context.emit('change', { downloadPercent: 1 + timerCount, downloadText: '正在合成图片' })
+            if(showProcess){
+              context.emit('change', { downloadPercent: 1 + timerCount, downloadText: '正在合成图片' })
+            }
           } else {
             clearInterval(animation)
           }
         }, 800)
         const cover = await proxy?.draw()
-        clearInterval(animation)
-        context.emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
+        if(showProcess){
+          clearInterval(animation)
+          context.emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
+        }
         if(proxy.dEditTemplateId > 0 && !isCreate){
           res = await api.template.update(
           { 
@@ -132,13 +138,14 @@ export default defineComponent({
             status: 1
           })
           if (!res.code){
-            this.$store.commit('setDEditTemplateId', res)
-            this.$router.push({ path: '/design', query: { tempid: res }, replace: true })
+            proxy.$store.commit('setDEditTemplateId', res)
+            proxy.$router.push({ path: '/design', query: { tempid: res }, replace: true })
           }
         }
-        context.emit('change', { downloadPercent: 100, downloadText: '保存完成' })
+        if(showProcess){
+          context.emit('change', { downloadPercent: 100, downloadText: '保存完成' })
+        }
       }
-      console.log(res)
       res.stat != 0 && useNotification('保存成功', '模板内容已变更')
     }
     // 停用启用
@@ -161,10 +168,14 @@ export default defineComponent({
       state.loading = true
       context.emit('update:modelValue', true)
       context.emit('change', { downloadPercent: 1, downloadText: '正在处理封面' })
-      await save(true)
+      if(proxy.dEditTemplateId){
+        await saveTemp(false, false)
+      }else{
+        await saveTemp(true, false)
+      }
       setTimeout(async () => {
-        const { id } = route.query
-        if (id) {
+        const { tempid } = route.query
+        if (tempid) {
           const { width, height } = proxy.dPage
           context.emit('update:modelValue', true)
           context.emit('change', { downloadPercent: 1, downloadText: '准备合成图片' })
@@ -178,7 +189,7 @@ export default defineComponent({
               clearInterval(animation)
             }
           }, 800)
-          await _dl.downloadImg(api.home.download({ id, width, height }) + '&r=' + Math.random(), (progress: number, xhr: any) => {
+          await _dl.downloadImg(api.home.download_cw_template({ tempid, width, height }) + '&r=' + Math.random(), (progress: number, xhr: any) => {
             if (props.modelValue) {
               clearInterval(animation)
               progress >= timerCount && context.emit('change', { downloadPercent: Number(progress.toFixed(0)), downloadText: '图片生成中' })
