@@ -33,7 +33,7 @@ const saveScreenshot = async (url: string, { path, width, height, thumbPath, siz
         headless: true, // !isDev,
         executablePath,
         ignoreHTTPSErrors: true, // 忽略https安全提示
-        args: puppeteerArgs.old, // 如puppeteer版本v20+报错请尝试使用新参数
+        args: puppeteerArgs.new, // 如puppeteer版本v20+报错请尝试使用新参数
         defaultViewport: null,
       })
     } catch (error) {
