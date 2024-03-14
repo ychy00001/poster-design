@@ -32,7 +32,7 @@ exports.filePath = isDev ? process.cwd() + `/static/` : serviceComfig.filePath
 /**
  * 配置服务器端的chrome浏览器位置
  */
-exports.executablePath = isDev ? null : '/opt/google/chrome-unstable/chrome'
+exports.executablePath = isDev ? null : '/opt/google/chrome/chrome'
 
 /**
  * 截图并发数上限
