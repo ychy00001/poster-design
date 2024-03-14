@@ -70,7 +70,7 @@ import usePageFontsFilter from './pageFontsFilter.ts'
 
 export default defineComponent({
   name: NAME,
-    components: { numberInput, colorSelect, iconItemSelect, textInputArea, valueSelect, effectWrap, numberSlider },
+    components: { toggleSwitch, numberInput, colorSelect, iconItemSelect, textInputArea, valueSelect, effectWrap, numberSlider },
     setup() {
       const store = useStore()
       const route = useRoute()

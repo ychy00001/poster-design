@@ -156,11 +156,6 @@ export default {
         if (this.ingoreKeys.indexOf(key) !== -1) {
           this.dActiveElement[key] = this.innerElement[key]
         } else if (key !== 'cropEdit' && key !== 'record' && this.innerElement[key] !== this.dActiveElement[key]) {
-          if(key == 'mask'){
-            console.log("bbb")
-            console.log(this.innerElement)
-            console.log(this.innerElement['mask'])
-          }
           this.updateWidgetData({
             uuid: this.dActiveElement.uuid,
             key: key,
@@ -269,8 +264,6 @@ export default {
       })
       // this.innerElement.width = img.width
       this.innerElement.mask = img.url
-      console.log("upload finish")
-      console.log(this.innerElement)
       this.$store.commit('setShowMoveable', true)
     },
     selectDone(img) {

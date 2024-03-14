@@ -8,7 +8,7 @@
 <template>
   <div class="text-input">
     <p v-if="label" class="input-label">{{ label }}</p>
-    <el-switch :value="modelValue" :disabled="disabled" @change="changeValue" /> 
+    <el-switch v-model="innerValue" :disabled="disabled" @change="changeValue" /> 
   </div>
 </template>
 
@@ -32,12 +32,17 @@ export default {
   emits: ['finish'],
   data() {
     return {
-      
+      innerValue: ''
     }
   },
   computed: {},
+  watch: {
+    modelValue(newV, oldV){
+      this.innerValue = newV;
+    }
+  },
   mounted(){
-    console.log(this.modelValue)
+    this.innerValue = this.modelValue 
   },
   methods: {
     changeValue(value) {

@@ -129,7 +129,6 @@ async function selectItem(item: IGetTempListData) {
     result = JSON.parse(item.data)
   }
   const { page, widgets } = result
-  console.log(widgets)
 
   store.commit('setDPage', page)
   store.dispatch('setTemplate', widgets)

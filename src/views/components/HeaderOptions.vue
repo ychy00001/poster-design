@@ -76,7 +76,6 @@ const state = reactive<TState>({
 onMounted(() => {
   const { tempid, tempType: type } = route.query
   store.commit('setDEditTemplateId', tempid)
-  console.log(dEditTemplateId)
 })
 
 const inputTitle = computed({
@@ -142,7 +141,6 @@ async function saveTemp(isCreate:boolean, showProcess: boolean) {
       }
     }, 800)
     const cover = await draw()
-    console.log("update_cover:" + cover)
     if(showProcess){
       clearInterval(animation)
       emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })

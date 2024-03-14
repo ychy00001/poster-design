@@ -39,7 +39,6 @@ const emit = defineEmits<TEmits>()
 watch(
   () => percent,
   (num) => {
-    console.log("watch num:" + num)
     if (num >= 100) {
       setTimeout(() => {
         emit('done')
