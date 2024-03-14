@@ -9,7 +9,7 @@
         background-color="#A82521"
         active-text-color="#F2F2F2"
         unique-opened
-        :collapse="isCollapse" 
+        :collapse="isCollapse"
         :collapse-transition="false"
         :router="true"
         >
@@ -42,7 +42,7 @@
         </div>
       </el-menu>
     </el-header>
-    
+
     <!-- 页面主体区域 -->
     <el-container style="height:100%;width:100%;overflow:auto">
         <!-- 路由占位符 -->

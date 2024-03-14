@@ -2,8 +2,8 @@
  * @Author: ShawnPhang
  * @Date: 2022-04-10 12:12:57
  * @Description: tooltip提示
- * @LastEditors: ShawnPhang
- * @LastEditTime: 2022-04-10 12:42:02
+ * @LastEditors: ShawnPhang <https://m.palxp.cn>
+ * @LastEditTime: 2024-03-11 01:41:20
 -->
 <template>
   <el-popover ref="popover" :placement="position" :title="title" :width="width" trigger="hover" :content="content">
@@ -13,28 +13,19 @@
   </el-popover>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+type TProps = {
+  title: string
+  width: number
+  content: string
+  position?: "bottom" | "auto" | "auto-start" | "auto-end" | "top" | "right" | "left" | "top-start" | "top-end" | "bottom-start" | "bottom-end" | "right-start" | "right-end" | "left-start" | "left-end"
+  offset?: number
+}
 
-export default defineComponent({
-  props: {
-    title: {
-      default: '',
-    },
-    width: {
-      default: 0,
-    },
-    content: {
-      default: '',
-    },
-    // top/top-start/top-end/bottom/bottom-start/bottom-end/left/left-start/left-end/right/right-start/right-end
-    position: {
-      default: 'bottom',
-    },
-    // offset: {
-    //   default: 0,
-    // },
-  },
-  setup() {},
+const { title, width, content, position } = withDefaults(defineProps<TProps>(), {
+  title: '',
+  width: 0,
+  content: '',
+  position: 'bottom'
 })
 </script>

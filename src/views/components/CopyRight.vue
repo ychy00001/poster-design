@@ -13,19 +13,10 @@
   </tool-tip>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
 import toolTip from '@/components/common/PopoverTip.vue'
 
-export default defineComponent({
-  components: { toolTip },
-  setup() {
-    const content = '海报渲染时间较长，请耐心等待！'
-    return {
-      content,
-    }
-  },
-})
+const content = '海报渲染时间较长，请耐心等待！'
 </script>
 
 <style lang="less" scoped>

@@ -3,7 +3,7 @@
  * @Date: 2021-08-27 15:16:07
  * @Description: 素材列表
  * @LastEditors: ShawnPhang <https://m.palxp.cn>
- * @LastEditTime: 2023-11-24 11:14:28
+ * @LastEditTime: 2024-02-29 16:49:59
 -->
 <template>
   <div class="wrap">
@@ -212,19 +212,22 @@ export default defineComponent({
 .list {
   width: 100%;
   padding: 3.1rem 0 0 1rem;
+  gap: 0px !important;
   &__item {
     overflow: hidden;
     background: #f8fafc;
+    margin-bottom: 8px;
+    margin-right: 8px;
   }
   &__img {
-    cursor: pointer;
+    cursor: grab;
     width: 142px;
     height: 142px;
     padding: 4px;
     border-radius: 4px;
   }
   &__img-thumb {
-    cursor: pointer;
+    cursor: grab;
     width: 90px;
     height: 90px;
     background: #f8fafc;

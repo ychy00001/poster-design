@@ -4,16 +4,16 @@
 
 ## 迅排设计
 
-一款漂亮且功能强大的在线海报图片设计器，仿稿定设计。
-
-适用于海报图片生成、电商分享图、文章长图、视频/公众号封面等多种场景。
+一款漂亮易用且功能强大的创意图片编辑器，对标稿定设计、创客贴、Canva 等商业产品。
 
 [![](https://xp.palxp.cn/images/2023-7-16-1689500112694.gif)](https://design.palxp.cn/)
+
+适用于多种场景：海报图片生成、电商分享图、文章长图、视频/公众号封面等，无需下载软件即可轻松实现云端编辑、迅速完成图文排版。
 
 - 丝滑的页面操作体验，丰富的交互细节，基础功能完善
 - 采用服务端生成图片，能确保多端出图统一性，支持各种 CSS 特性
 - 简易 AI 抠图工具，上传图片一键去除背景
-- 技术栈：Vue3 、Vite2 、Vuex 、ElementPlus，开发体验畅快
+- 技术栈：Vue3 、Vite5 、Vuex 、ElementPlus，开发体验畅快
 - 图片生成：Puppeteer、Express
 
 ### 支持功能
@@ -35,28 +35,38 @@
 git clone https://github.com/palxiao/poster-design.git
 cd poster-design
 npm run prepared
-npm run serve
+npm run dev
+cd screreenshot
+npm run dev
 ```
 
 ![](https://xp.palxp.cn/images/2023-7-16-1689498291322.png)
 
-访问 http://127.0.0.1:3000/ 查看网页。点此查看[完整说明文档](https://xp.palxp.cn/#/articles/1689319644311)。
+访问 http://127.0.0.1:5173/ 查看网页。点此查看[更多说明文档](https://xp.palxp.cn/#/articles/1689319644311)。
 
 ### 图片生成服务
 
 代码位于根目录 [/screenshot](https://github.com/palxiao/poster-design/tree/main/screenshot)，接口API文档点此查看：[接口 API 文档](https://xp.palxp.cn/apidoc/screenshot.html)。
 
-> 更多相关事项请进入该目录下查看 [README.md](https://github.com/palxiao/poster-design/blob/main/screenshot/README.md) 文件。 Docker 部署：[参考说明](https://xp.palxp.cn/#/articles/1689319644311?id=docker%e5%ae%b9%e5%99%a8)。
-
 ### 服务端
 
-目前本项目演示 Demo 中的后端接口参考：[接口 API 文档](https://xp.palxp.cn/apidoc/index.html)。
+后端需要自己开发，目前本项目演示 Demo 中的后端接口参考：[接口 API 文档](https://xp.palxp.cn/apidoc/index.html)。
 
 ## 其它
 
-项目最早使用 Vue2 开发，后改用 Vue3 重构，目前有部分代码混合了 Options 写法。
+我们尝试沉淀一个高质量内容社区，形成可持续学习的平台，同时解决开发者在项目中遇到的疑难和困惑，帮大家少走一些弯路。
 
-目前也还在持续迭代中，有很多的不足，我也是一边学习一边成长。[实时迭代计划文档](https://xp.palxp.cn/#/articles/1689319986889?id=%e8%bf%ad%e4%bb%a3%e8%ae%a1%e5%88%92).
+<img style="width: 380px;" src="https://github.com/palxiao/poster-design/assets/21021314/643dcc8b-ef73-4c76-a78c-a7c377b5f268" />
+
+也欢迎关注公众号：品味前端
+
+<img style="width: 380px;" src="https://xp.palxp.cn/images/2024-3-1-1709306365949.png" />
+
+-----
+
+本项目最早使用 Vue2 开发，现改用 Vue3 重构中。[一些迭代计划记录](https://xp.palxp.cn/#/articles/1689319986889?id=%e8%bf%ad%e4%bb%a3%e8%ae%a1%e5%88%92).
+
+目前开源版仍在持续迭代中，还有很多的不足，可以将你遇到的问题在 Issues 中提出，或者提交 Pull Request 帮助完善。
 
 ### 感谢
 
@@ -67,13 +77,11 @@ npm run serve
 - [qr-code-styling](https://qr-code-styling.com/): 风格化二维码
 - [rembg](https://github.com/danielgatis/rembg): 图片抠图，使用 u2net 预训练模型
 
-或许你在工作中有类似的需求，或许你对开发编辑器感兴趣，也希望这个项目能给到你一些微薄帮助！
-
-### `Star`
-
-开源不易，别忘了给本项目点个 **Star** ~
+开源不易，最后别忘了给本项目点个 **Star** ~
 
 [![Star History Chart](https://api.star-history.com/svg?repos=palxiao/poster-design&type=Date)](https://star-history.com/#palxiao/poster-design&Date)
+
+### `Star`
 
 感谢所有支持本项目的朋友 :heart:
 
@@ -85,6 +93,12 @@ npm run serve
 
 [![Forkers](https://bytecrank.com/nastyox/reporoster/php/forkersSVG.php?user=palxiao&repo=poster-design)](https://github.com/palxiao/poster-design/network/members)
 
+### 友情赞助商
+
+| Dooring低代码 | DrawOn桌案 |
+| --- | --- |
+| <a href="https://dooring.vip/"> <img style="height: 90px" src="https://github.com/palxiao/poster-design/assets/21021314/2240801f-8484-4fd2-8505-8205daa6d53c" /></a> | <a href="https://www.drawon.cn?useSource=hb1"> <img style="height: 120px" src="https://github.com/palxiao/poster-design/assets/21021314/258bb6ec-4e1e-4c86-b45c-22946213f209" /></a> |
+
 ### `Contributions`
 
 <a href="https://github.com/palxiao/poster-design/graphs/contributors">
@@ -93,5 +107,5 @@ npm run serve
 
 ### `LICENSE`
 
-本项目完全免费，遵循 [MIT 开源许可证](https://github.com/palxiao/poster-design/blob/main/LICENSE)
+本项目完全免费，可在保留 [MIT 开源许可证](https://github.com/palxiao/poster-design/blob/main/LICENSE) 的前提下使用。
 

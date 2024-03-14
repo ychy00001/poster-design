@@ -3,7 +3,7 @@
  * @Date: 2023-10-04 02:04:04
  * @Description: 列表分类头部
  * @LastEditors: ShawnPhang <https://m.palxp.cn>
- * @LastEditTime: 2023-10-04 02:30:59
+ * @Date: 2024-03-06 21:16:00
 -->
 <template>
   <div v-if="!isBack" class="content__wrap">
@@ -21,22 +21,32 @@
   </span>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+export type TClassHeaderTypeData = {
+  name: string
+}
 
-export default defineComponent({
-  props: ['types', 'isBack'],
-  emits: ['select', 'back'],
-  setup(props, { emit }) {
-    const select = (item: any) => {
-      emit('select', item)
-    }
-    const back = () => {
-      emit('back')
-    }
-    return { select, back }
-  },
-})
+type TProps = {
+  types: TClassHeaderTypeData[]
+  isBack?: boolean
+}
+
+type TEmits = {
+  (event: 'select', data: string[]): void
+  (event: 'back'): void
+}
+
+const { types, isBack } = defineProps<TProps>()
+const emit = defineEmits<TEmits>()
+
+const select = (item: any) => {
+  emit('select', item)
+}
+const back = () => {
+  emit('back')
+}
+
+defineExpose({ select, back })
 </script>
 
 <style lang="less" scoped>
