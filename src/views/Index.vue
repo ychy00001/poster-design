@@ -74,7 +74,7 @@ export default defineComponent({
         {
           id: 2,
           path: "/list",
-          authName: "列表",
+          authName: "海报",
           children: []
         },
         {
