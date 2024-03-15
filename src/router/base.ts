@@ -49,6 +49,11 @@ export default [
         component: () => import(/* webpackChunkName: 'base' */ '@/views/welcome/Index.vue'),
       },
       {
+        path: '/list',
+        name: 'List',
+        component: () => import(/* webpackChunkName: 'base' */ '@/views/list/Index.vue'),
+      },
+      {
         path: '/design',
         name: 'Design',
         component: () => import(/* webpackChunkName: 'base' */ '@/views/design/Index.vue'),

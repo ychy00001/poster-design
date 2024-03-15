@@ -26,6 +26,9 @@ export const file_upload = (file: File, cb: Function) => {
 // 生成海报
 export const poster_generate = (params: Type.Object = {}) => cw_fetch('/poster/generate', params, 'post')
 
+// 获取模版
+export const page = (params: Type.Object = {}) => cw_fetch('/poster/page', params, 'get')
+
 // 获取海报
 export const get = (params: Type.Object = {}) => cw_fetch('/poster/get', params, 'get')
 

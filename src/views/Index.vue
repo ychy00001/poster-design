@@ -7,11 +7,12 @@
         mode="horizontal"
         text-color="#fff"
         background-color="#A82521"
-        active-text-color="#F2F2F2"
+        active-text-color="#F3F3F3"
         unique-opened
         :collapse="isCollapse"
         :collapse-transition="false"
         :router="true"
+        :default-active="activeMenu"
         >
         <el-menu-item index="/">
           <img
@@ -44,7 +45,7 @@
     </el-header>
 
     <!-- 页面主体区域 -->
-    <el-container style="height:100%;width:100%;overflow:auto">
+    <el-container style="height:100%;width:100%;overflow:auto" id="main_content">
         <!-- 路由占位符 -->
         <router-view></router-view>
     </el-container>
@@ -62,6 +63,7 @@ export default defineComponent({
   mixins: [],
   setup() {
     const state = reactive({
+      activeMenu: "",
       menulist:[
         {
           id: 1,
@@ -71,6 +73,12 @@ export default defineComponent({
         },
         {
           id: 2,
+          path: "/list",
+          authName: "列表",
+          children: []
+        },
+        {
+          id: 3,
           path: "/design",
           authName: "设计",
           children: []
@@ -78,8 +86,8 @@ export default defineComponent({
       ],
       iconsObj: {
         1: 'iconfont icon-home',
-        2: 'iconfont icon-skin',
-        3: 'iconfont icon-drag',
+        2: 'iconfont icon-project',
+        3: 'iconfont icon-skin',
         4: 'iconfont icon-thunderbolt',
         5: 'iconfont icon-fire'
       },
@@ -96,17 +104,22 @@ export default defineComponent({
   },
   computed: {
   },
-  // watch: {
-  //   $route() {
-  //     console.log('change route', this.$route.query)
-  //     this.loadData()
-  //   },
-  // },
+  watch: {
+    $route() {
+      this.setActiveMenu()
+    },
+  },
   mounted() {
+    // this.path = this.$route.path
+    // console.log(this.paths)
+    this.setActiveMenu();
   },
   beforeUnmount() {
   },
   methods: {
+    setActiveMenu () {
+      this.activeMenu = this.$route.path
+    },
     logout () {
       window.sessionStorage.clear()
       this.$router.push('/login')
@@ -126,6 +139,12 @@ export default defineComponent({
 .home_container .el-menu {
   width: 100%;
 }
+/* 设置选中项的背景和文本颜色 */
+.el-menu-item.is-active {
+  background-color: #882133 !important; /* 背景色 */
+  color: #F2F2F2 !important; /* 文本颜色 */
+}
+
 .home_container .el-menu--horizontal>.el-menu-item{
   height: auto !important;
 }
