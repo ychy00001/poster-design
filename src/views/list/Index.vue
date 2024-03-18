@@ -4,7 +4,7 @@
   </div>
   <div v-else>
     <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" :infinite-scroll-distance="200">
-      <PostListCard :card_columns="card_columns" @show-detail="showMessage" ref="homeCardRef"></PostListCard>
+      <PostListCard :card_columns="card_columns" @show-detail="showMessage" @del-poster="delPoster" ref="homeCardRef"></PostListCard>
     </div>
   </div>
 </template>
@@ -12,8 +12,10 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import PostListCard from "@/components/business/poster/PostListCard.vue"
+import useNotification from '@/common/methods/notification'
 import {resizeWaterFall, waterFallInit, waterFallMore} from "@/utils/waterFall";
 import api from "@/api"
+import {removeListByValue} from "@/utils/utils"
 
 interface CardItem {
   id: number
@@ -80,7 +82,20 @@ async function queryDate(){
   }
   return posterList
 }
-
+// 删除
+const delPoster = async(id:number) => {
+  if (!id) return
+  console.log("删除id"+id)
+  const res = await api.poster.del({id})
+  console.log(res)
+  if(!res.code){
+    //删除成功
+    useNotification('删除成功')
+    // 删除条目
+    removeListByValue(cards.value, 'id', id)
+    waterFallInit(columns, card_columns, arrHeight, cards)
+  }
+}
 // 详情
 const showMessage = async (id, left, top) => {
   // 跳转编辑

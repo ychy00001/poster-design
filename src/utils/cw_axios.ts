@@ -31,7 +31,7 @@ cw_axios.interceptors.request.use(
       url.indexOf('/') === 0 ? (config.url = baseUrl + url) : (config.url = baseUrl + '/' + url)
     }
 
-    if (config.method === 'get') {
+    if (config.method === 'get' || config.method === 'delete') {
       //  config.params = utils.extend(config.params, values)
       config.params = Object.assign(config.params, values)
       // config.params = qs.stringify(config.params);
@@ -87,8 +87,14 @@ const cw_fetch = (url: string, params: Type.Object, type: string | undefined = '
    }
   token && (headerObject.authorization = token)
   
-  if (type === 'get') {
+  if ( type === 'get') {
     return cw_axios.get(url, {
+      headers: Object.assign(headerObject, exheaders),
+      params,
+      ...extra,
+    })
+  } else if (type === 'delete') {
+    return cw_axios.delete(url, {
       headers: Object.assign(headerObject, exheaders),
       params,
       ...extra,

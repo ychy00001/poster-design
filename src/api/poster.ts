@@ -34,3 +34,6 @@ export const get = (params: Type.Object = {}) => cw_fetch('/poster/get', params,
 
 // 保存海报
 export const update = (params: Type.Object = {}) => cw_fetch('/poster/update', params, 'put')
+
+// 删除海报
+export const del = (params: Type.Object = {}) => cw_fetch('/poster/delete', params, 'delete')

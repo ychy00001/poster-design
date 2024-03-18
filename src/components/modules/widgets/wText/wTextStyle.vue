@@ -90,7 +90,7 @@ export default defineComponent({
       })
       const dActiveElement = computed(() => store.getters.dActiveElement)
       const dMoving = computed(() => store.getters.dMoving)
-      // const isDraw = computed(() => route.name === 'Draw')
+      const isDesign = computed(() => route.name === 'Design')
 
       watch(() => dActiveElement.value, () => {
         change()

@@ -13,7 +13,7 @@
     </el-divider>
 
     <ul ref="listRef" v-infinite-scroll="load" class="infinite-list" :infinite-scroll-distance="150" style="overflow: auto">
-      <img-water-fall :listData="state.list" @select="selectItem" />
+      <img-water-fall :listData="state.list" @select="selectItem" @del-item="delTemplate" />
       <div v-show="state.loading" class="loading"><i class="el-icon-loading"></i> 拼命加载中</div>
       <div v-show="state.loadDone" class="loading">全部加载完毕</div>
     </ul>
@@ -29,9 +29,11 @@ import { LocationQueryValue, useRoute, useRouter } from 'vue-router'
 // import editModel from './components/editModel.vue'
 import searchHeader from './components/searchHeader.vue'
 import useConfirm from '@/common/methods/confirm'
+import useNotification from '@/common/methods/notification'
 import { useSetupMapGetters } from '@/common/hooks/mapGetters'
 import imgWaterFall from './components/imgWaterFall.vue'
 import { IGetTempListData } from '@/api/home'
+import {removeListByValue} from "@/utils/utils"
 
 type TState = {
   loading: boolean
@@ -60,7 +62,7 @@ const state = reactive<TState>({
   searchKeyword: '',
 })
 
-const { tempEditing, dHistoryParams } = useSetupMapGetters(['tempEditing', 'dHistoryParams'])
+const { dEditTemplateId, tempEditing, dHistoryParams } = useSetupMapGetters(['dEditTemplateId','tempEditing', 'dHistoryParams'])
 
 const pageOptions: TPageOptions = { pageNo: 0, pageSize: 20, cate: 1 }
 const { cate, edit } = route.query
@@ -92,6 +94,56 @@ const load = async (init: boolean = false, stat?: string) => {
     state.loading = false
     checkHeight()
   }, 100)
+}
+
+// 删除
+const delTemplate = async(id:number) => {
+  if (!id) return
+  const res = await api.template.del({id})
+  if(!res.code){
+    if(id == dEditTemplateId.value){
+        // 当前选择的界面是删除的模版 移除选项，移除路由参数
+        router.push({ path: '/design', replace: true })
+        store.commit('setDPage', {
+          name: '背景页面',
+          type: 'page',
+          uuid: '-1',
+          left: 0,
+          top: 0,
+          width: 1920, // 画布宽度
+          height: 1080, // 画布高度
+          backgroundColor: '#ffffff', // 画布背景颜色
+          backgroundImage: '', // 画布背景图片
+          backgroundTransform: {},
+          opacity: 1, // 透明度
+          tag: 0, // 强制刷新用
+          setting: [
+            {
+              label: '背景颜色',
+              parentKey: 'backgroundColor',
+              value: false,
+            },
+          ],
+          record: {},
+        })
+        store.commit('setDTitle', '')
+        store.commit('setDEditTemplateId', -1)
+        store.commit('setDWidgets', [])
+        store.dispatch('setTemplate', [])
+        store.dispatch('selectWidget', {
+          uuid: '-1'
+        })
+        setTimeout(() => {
+          store.commit('zoomScreenChange')
+        }, 300)
+    }
+    //删除成功
+    useNotification('删除成功')
+    // 删除条目
+    load(true, pageOptions.state)
+  }else{
+    state.loading = false
+  }
 }
 
 function cateChange(type: any) {

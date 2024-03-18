@@ -108,4 +108,23 @@ export const uuid = (len:any, radix:any) => {
  return uuid.join('');
 }
 
+export const removeListByValue = (arr: any[], attr: string, value: any) => {
+  let index : any = 0;
+  let flag = false;
+  for(let i in arr){
+    if(arr[i][attr] === value){
+      if(arr[i][attr] == value){
+        index = i;
+        flag = true;
+        break;
+      }
+    }else{
+      flag = false
+    }
+  }
+  if(flag){
+    arr.splice(index, 1);
+  }
+}
+
 export default {}

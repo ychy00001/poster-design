@@ -16,9 +16,9 @@
       <div class="divide__line">|</div>
     </template>
     <!-- <el-button @click="draw">绘制(测试)</el-button> -->
-    <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false, true)">保存模板</el-button>
+    <!-- <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false, true)">保存模板</el-button> -->
     <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true, true)">另存模板</el-button>
-    <el-button v-else :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true,true)">保存模版</el-button>
+    <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false,true)">保存模版</el-button>
     <copyRight>
       <el-button :loading="state.loading" size="large" class="primary-btn" :disabled="tempEditing" plain type="primary" @click="download">下载作品</el-button>
     </copyRight>
@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import api from '@/api'
-import { reactive, toRefs, ref ,computed, onMounted} from 'vue'
+import { reactive, toRefs, ref ,computed, onMounted, watch} from 'vue'
 import { mapGetters, mapActions, useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import _dl from '@/common/methods/download'

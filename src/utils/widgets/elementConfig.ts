@@ -83,8 +83,8 @@ import {
   ElUpload,
   ElInfiniteScroll,
   ElLoading,
-  // ElMessage,
-  // ElMessageBox,
+  ElMessage,
+  ElMessageBox,
   // ElNotification,
 } from 'element-plus'
 
@@ -137,6 +137,8 @@ const components = [
   ElMenu,
   ElMenuItem,
   ElMenuItemGroup,
+  ElMessage,
+  ElMessageBox,
   ElOption,
   ElOptionGroup,
   // ElPageHeader,

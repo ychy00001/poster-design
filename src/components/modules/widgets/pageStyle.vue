@@ -7,7 +7,7 @@
       <bg-img-list-wrap style="padding-top: 2rem;" model="stylePanel" />
     </div>
     <el-collapse v-else v-model="activeNames">
-      <el-collapse-item title="元数据" name="1">
+      <el-collapse-item v-if="isDesign" title="元数据" name="1">
         <div class="position-size">
           <text-select v-model="bizName" :options="bizNameOptions" label="类型" @finish="(value) => changeBizName(value)"  />
         </div>
@@ -84,6 +84,9 @@ export default {
   },
   computed: {
     ...mapGetters(['dBizName', 'dKeyword','dActiveElement']),
+    isDesign(){
+      return this.$route.name === 'Design'
+    }
   },
   watch: {
     dActiveElement: {

@@ -23,6 +23,9 @@
                   />
                 </RouterLink> -->
                 <div class="username">创建时间：{{formatDate(card.createTime)}}</div>
+                <div class="del" @click.stop="delPoster(card.id, card.title)">
+                  <i class="iconfont icon-delete"></i>
+                </div>
               </el-row>
             </div>
           </div>
@@ -43,6 +46,9 @@
                     <div class="avatar"></div>
                   </RouterLink> -->
                   <div class="username">创建时间：{{ formatDate(card.createTime) }}</div>
+                  <div class="del">
+                    <i class="iconfont icon-delete"></i>
+                  </div>
                 </el-row>
               </div>
             </div>
@@ -55,10 +61,12 @@
         @close="closeViewer"
         :url-list="[imgPreviewUrl]" />
   </div>
+  
 </template>
 
 <script setup>
 import {ref} from "vue";
+import {ElMessageBox, ElMessage} from 'element-plus'
 
 defineProps({
   card_columns: {
@@ -68,7 +76,7 @@ defineProps({
 })
 
 
-const emit = defineEmits(['show-detail'])
+const emit = defineEmits(['show-detail', 'del-poster'])
 const details = (id) => {
   const target = event.target;
   const left = target.x;
@@ -80,6 +88,27 @@ const handleLoad = (card) => {
   card.load = true
 }
 
+// 删除海报
+function delPoster(id, title){
+  ElMessageBox.confirm(
+    '是否删除海报: ' + id + ":" +title + "?",
+    'Warning',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      emit('del-poster', id)
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除',
+      })
+    })
+}
 
 // 图片预览
 const imgPreviewShow = ref(false)
@@ -164,10 +193,34 @@ section {
   opacity: 0.7;
 }
 
+.bottom {
+  position: relative;
+}
 .username {
   /* margin-left: 10px; */
   font-weight: 200;
   font-size: 0.5rem;
 }
+.del {
+  position: absolute;
+  right : 10px;
+  font-weight: 100;
+  font-size: 0.3rem;
+}
+.del .iconfont {
+  font-size: 14px;
+  transition: all 0.2s ease-in;
+}
+
+/* 鼠标移入悬浮效果 */
+.del .iconfont:hover{    
+  font-size: 18px;
+  color:rgb(44, 178, 178);
+  -webkit-box-shadow: 0 0 30px rgba(0,0,0,0.1);
+  box-shadow: 0 0 30px rgba(0,0,0,0.15);
+  -webkit-transform: translate3d(0, 0px, -2px);
+  transform: translate3d(0, 1px, -2px);    
+}
+
 
 </style>

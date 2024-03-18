@@ -13,8 +13,11 @@ export const get = (params: Type.Object = {}) => cw_fetch('/template/get', param
 // 获取模版
 export const page = (params: Type.Object = {}) => cw_fetch('/template/page', params, 'get')
 
-// 保存海报
+// 保存模版
 export const update = (params: Type.Object = {}) => cw_fetch('/template/update', params, 'put')
 
-// 保存海报
+// 保存模版
 export const create = (params: Type.Object = {}) => cw_fetch('/template/create', params, 'post')
+
+// 删除模版
+export const del = (params: Type.Object = {}) => cw_fetch('/template/delete', params, 'delete')
