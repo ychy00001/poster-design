@@ -12,12 +12,12 @@
               class="demo-ruleForm"
               label-width="auto"
             >
-              <el-form-item label="类&#12288;型" prop="bizName" >
+              <el-form-item label="行&#12288;业" prop="bizName" >
                 <el-select v-model="state.formInfo.bizName" placeholder="请选择分类" disabled="true" value="食品">
                   <el-option label="食品" value="食品" />
                 </el-select>
               </el-form-item>
-              <el-form-item label="关键词" prop="keyword" >
+              <el-form-item label="风&#12288;格" prop="keyword" >
                 <el-checkbox-group v-model="selectKeywords">
                   <el-checkbox-button v-for="keyword in keywords" :key="keyword" :value="keyword" >
                     {{keyword}}
@@ -850,4 +850,8 @@ function designPoster(id: any) {
   padding: 5px 11px;
   font-size: 12px;
 }
+
+// /deep/ .el-form-item__label{
+  // font-size: 14px !important;
+// }
 </style>
