@@ -13,14 +13,18 @@
               label-width="auto"
             >
               <el-form-item label="类&#12288;型" prop="bizName" >
-                <el-select v-model="state.formInfo.bizName" placeholder="请选择分类">
+                <el-select v-model="state.formInfo.bizName" placeholder="请选择分类" disabled="true" value="食品">
                   <el-option label="食品" value="食品" />
                 </el-select>
               </el-form-item>
               <el-form-item label="关键词" prop="keyword" >
-                  <el-input v-model="state.formInfo.keyword" placeholder="输入关键词" />
+                <el-checkbox-group v-model="selectKeywords">
+                  <el-checkbox-button v-for="keyword in keywords" :key="keyword" :value="keyword" >
+                    {{keyword}}
+                  </el-checkbox-button>
+                </el-checkbox-group>
               </el-form-item>
-              <el-form-item label="参考图" prop="参考图">
+              <el-form-item label="产品图" prop="产品图">
                 <el-upload
                   class="upload-boarder"
                   :action="UPDATE_URL"
@@ -78,11 +82,27 @@
           </div>
         </div>
       </el-aside>
-      <el-main class="gen-main" v-loading="!state.isGenerateFinish" :xs="12" :sm="12" :md="16" :lg="16" :xl="16">
+      <el-main class="gen-main" :xs="12" :sm="12" :md="16" :lg="16" :xl="16">
         <!-- 展示4张海报 -->
         <div v-if="state.generateList.length > 0" class="generate-image" >
           <div class="gen-item" v-for="imgItem in state.generateList" :key="imgItem.id" >
-            <el-image :src="imgItem.cover" fit="contain"  style="height:93%;" @click="designPoster(imgItem.id)" />
+            <el-image v-if="imgItem.genState == 0" :src="imgItem.cover" fit="contain"  style="height:93%;" @click="designPoster(imgItem.id)" />
+            <div v-else class="gen-loading">
+              <div class="loading-text">
+                <div v-if="imgItem.genState == 1" class="generating"></div>
+                <div v-if="imgItem.genState == 2" class="queueing"></div>
+              </div>
+              <div class="loading">
+                <div class="shape shape-4">
+                  <div class="shape-4-top"></div>
+                  <div class="shape-4-bottom"></div>
+                  <div class="shape-4-eye"></div>
+                </div>
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+              </div>
+            </div>
             <!-- <el-button class="edit" type="primary" @click="designPoster(imgItem.id)">编辑</el-button> -->
           </div>
         </div>
@@ -101,14 +121,14 @@
 
 <script lang="ts" setup>
 import type { FormInstance, FormRules, UploadProps, UploadUserFile } from 'element-plus'
-import { defineComponent, reactive, toRefs , ref, onMounted} from 'vue'
+import { defineComponent, reactive, toRefs , ref, onMounted, watch} from 'vue'
 import { ElMessage as ElMsg } from 'element-plus'
 import app_config from '@/config'
 import api from '@/api'
 
 const state = reactive({
   formInfo: {
-    bizName: '',
+    bizName: '食品',
     keyword: '',
     imageUrl: '',
     isSegmentation: false,
@@ -123,20 +143,33 @@ onMounted(() => {
   //   {
   //     id: 1,
   //     cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
+  //     genState: 0, // 成功
   //   },
   //   {
   //     id: 1,
   //     cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
+  //     genState: 1, // 生成中 
   //   },
   //   {
   //     id: 1,
   //     cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
+  //     genState: 2, // 排队中
   //   },
   //   {
   //     id: 1,
   //     cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
+  //     genState: 2, // 排队中
   //   },
   // ]
+})
+
+
+// 可以直接侦听一个 ref
+const selectKeywords = ref(['通用'])
+const keywords = ['通用', '简约', '中国风', '科技风', '动感', '带货', '年轻人', '老人'
+,'节日', '电商', '清新', '浪漫', '夏日凉爽', '暖色调', '冷色调', '可爱', '展台', '炫彩渐变', '便签笔记']
+watch(selectKeywords, (newVal, oldVal) => {
+  state.formInfo.keyword = newVal.join(",")
 })
 
 // 图片上传
@@ -144,8 +177,6 @@ const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 const disabled = ref(false)
 const UPDATE_URL = app_config.POSTER_API_URL + "/ai-poster/poster/upload"
-
-const genLoding = ref<FormInstance>()
 
 // 表单上传
 const ruleFormRef = ref<FormInstance>()
@@ -237,14 +268,19 @@ function testUpload(){
   //   })
   // })
 }
+
 function submitForm(formEl: FormInstance | undefined) {
   if (!formEl) return
   formEl.validate(async (valid) => {
     if (valid) {
       state.isGenerateFinish = false
+      initLoadingState()
       const data = await api.poster.poster_generate(state.formInfo)
       if(!data.code){
         state.generateList = data;
+        state.generateList.forEach((item:any) => {
+          item['genState'] = 0;
+        })
       }
       state.isGenerateFinish = true
     } else {
@@ -253,6 +289,33 @@ function submitForm(formEl: FormInstance | undefined) {
     }
   })
 }
+
+function initLoadingState(){
+  //genState 0 成功，1 生成中，2 排队中
+  state.generateList = [
+    {
+      id: 1,
+      cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
+      genState: 1, // 成功
+    },
+    {
+      id: 2,
+      cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
+      genState: 2, // 生成中 
+    },
+    {
+      id: 3,
+      cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
+      genState: 2, // 排队中
+    },
+    {
+      id: 4,
+      cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
+      genState: 2, // 排队中
+    },
+  ]
+}
+
 function designPoster(id: any) {
   if (!id) return
   // this.$router.push({
@@ -410,6 +473,348 @@ function designPoster(id: any) {
 .gen-main .generate-image .gen-item:nth-of-type(4) {
   margin-bottom: 0;
 }
+.gen-main .generate-image .gen-item .gen-loading{
+  width: 100%;
+  height: 100%;
+  background: #E6E6E6;
+  border-radius: 10px;
+
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: column;
+}
+
+// 加载动效
+.gen-loading .loading {
+  margin-top: 10px;
+  width: 30px;
+  height: 30px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.gen-loading .shape {
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.gen-loading .shape-1 {
+  background-color: #95DA69;
+  left: -12px;
+  animation: animationShape1 7s linear infinite;
+}
+
+.gen-loading .shape-2 {
+  background-color: #F1AC6A;
+  left: 8px;
+  animation: animationShape2 7s linear infinite;
+}
+
+.gen-loading .shape-3 {
+  background-color: #E777B6;
+  left: 30px;
+  animation: animationShape3 7s linear infinite;
+}
+
+.gen-loading .shape-4 {
+  background-color: #f2b736;
+  width: 30px;
+  height: 30px;
+  left: -40px;
+  background-color: transparent !important;
+  z-index: 2;
+  animation: animationShape4 7s linear infinite;
+}
+
+.gen-loading .shape-4 > div {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.gen-loading .shape-4 .shape-4-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #70D5D7;
+  clip: rect(0 30px 15px 0);
+  transform: rotate(-30deg);
+  animation: animationShape4Top 0.4s ease infinite alternate;
+}
+
+.gen-loading .shape-4 .shape-4-bottom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #70D5D7;
+  clip: rect(15px 30px 30px 0);
+  transform: rotate(45deg);
+  animation: animationShape4Bottom 0.4s ease infinite alternate;
+}
+
+.gen-loading .shape-4 .shape-4-eye {
+  width: 5px;
+  height: 5px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+  position: absolute;
+  top: 5px;
+  right: 10px;
+}
+
+@keyframes animationShape4Top {
+  0% {
+    transform: rotate(-30deg);
+  }
+
+  100% {
+    transform: rotate(0);
+  }
+}
+
+@keyframes animationShape4Bottom {
+  0% {
+    transform: rotate(45deg);
+  }
+
+  100% {
+    transform: rotate(0);
+  }
+}
+
+@keyframes animationShape1 {
+  0% {
+    opacity: 1;
+  }
+
+  17% {
+    opacity: 1;
+  }
+
+  19% {
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 0;
+  }
+
+  95% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes animationShape2 {
+  0% {
+    opacity: 1;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  22% {
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0;
+  }
+
+  45% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 0;
+  }
+
+  90% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes animationShape3 {
+  0% {
+    opacity: 1;
+  }
+
+  27% {
+    opacity: 1;
+  }
+
+  29% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 0;
+  }
+
+  64% {
+    opacity: 1;
+  }
+
+  65% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 0;
+  }
+
+  80% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes animationShape4 {
+  0% {
+    left: -40px;
+    transform: rotateY(0);
+  }
+
+  45% {
+    left: 50px;
+    transform: rotateY(0);
+  }
+
+  50% {
+    left: 50px;
+    transform: rotateY(180deg);
+  }
+
+  95% {
+    left: -40px;
+    transform: rotateY(180deg);
+  }
+
+  100% {
+    left: -40px;
+    transform: rotateY(0);
+  }
+}
+// 加载动效结束
+
+// 加载动效
+.gen-loading .loading-text {
+  margin-top: -10px;
+  height: 30px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+// 排队中
+.gen-loading .loading-text .generating {
+  display: inline-block;
+  position: relative;
+}
+
+.gen-loading .loading-text .generating::before {
+  content: "生成中...";
+  color: #666;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+  display: inline-block;
+  animation: loading-text-floating 0.7s ease-out infinite alternate;
+}
+.gen-loading .loading-text .generating::after {
+  content: "";
+  width: 100%;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  filter: blur(4px);
+  border-radius: 50%;
+  animation: loading-text-animation 0.7s ease-out infinite alternate;
+}
+
+// 生成中
+.gen-loading .loading-text .queueing {
+  display: inline-block;
+  position: relative;
+}
+
+.gen-loading .loading-text .queueing::before {
+  content: "排队中...";
+  color: #666;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+  display: inline-block;
+  animation: loading-text-floating 0.7s ease-out infinite alternate;
+}
+
+.gen-loading .loading-text .queueing::after {
+  content: "";
+  width: 100%;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  filter: blur(4px);
+  border-radius: 50%;
+  animation: loading-text-animation 0.7s ease-out infinite alternate;
+}
+
+@keyframes loading-text-floating {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes loading-text-animation {
+  0% {
+    transform: scale(0.8);
+  }
+
+  100% {
+    transform: scale(1.2);
+  }
+}
+// 生成中结束
 
 .gen-main .edit-templates__initialized{
   position: relative;
@@ -438,4 +843,11 @@ function designPoster(id: any) {
   font: 600 20px/1.3 "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB","WenQuanYi Micro Hei",Arial, sans-serif, Apple Color Emoji,Segoe UI Emoji;
 }
 
+.aside-main /deep/ .el-checkbox-button__inner{
+  margin: 2px 4px 2px 3px;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 5px;
+  padding: 5px 11px;
+  font-size: 12px;
+}
 </style>
