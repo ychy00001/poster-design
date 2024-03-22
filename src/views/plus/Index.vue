@@ -11,20 +11,9 @@
               :rules="rules"
               class="demo-ruleForm"
               label-width="auto"
+              label-position="top"
             >
-              <el-form-item label="行&#12288;业" prop="bizName" >
-                <el-select v-model="state.formInfo.bizName" placeholder="请选择分类" disabled="true" value="食品">
-                  <el-option label="食品" value="食品" />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="风&#12288;格" prop="keyword" >
-                <el-checkbox-group v-model="selectKeywords">
-                  <el-checkbox-button v-for="keyword in keywords" :key="keyword" :value="keyword" >
-                    {{keyword}}
-                  </el-checkbox-button>
-                </el-checkbox-group>
-              </el-form-item>
-              <el-form-item label="产品图" prop="产品图">
+              <el-form-item label="产品图：" prop="imgUrl">
                 <el-upload
                   class="upload-boarder"
                   :action="UPDATE_URL"
@@ -32,31 +21,31 @@
                   :limit="1"
                   :show-file-list="false"
                   :before-upload="beforeImgUpload"
-                  :on-success="handleImgSuccess"
+                  :on-success="handleBgImgSuccess"
                 >
-                  <!-- <img v-if="state.formInfo.imageUrl" :src="state.formInfo.imageUrl" class="avatar" /> -->
-                  <div v-if="state.formInfo.imageUrl">
+                  <!-- <img v-if="state.formInfo.imgUrl" :src="state.formInfo.imgUrl" class="avatar" /> -->
+                  <div v-if="state.formInfo.pageBgImg">
                     <ul class="el-upload-list el-upload-list--picture-card">
                       <li class="el-upload-list__item is-ready">
-                        <img class="el-upload-list__item-thumbnail" :src="state.formInfo.imageUrl" alt="" />
+                        <img class="el-upload-list__item-thumbnail" :src="state.formInfo.pageBgImg" alt="" />
                         <span class="el-upload-list__item-actions">
                           <span
                             class="el-upload-list__item-preview"
-                            @click.stop="handlePictureCardPreview(state.formInfo.imageUrl)"
+                            @click.stop="handlePictureCardPreview(state.formInfo.pageBgImg)"
                           >
                             <el-icon><zoom-in /></el-icon>
                           </span>
                           <!-- <span
                             v-if="!disabled"
                             class="el-upload-list__item-delete"
-                            @click.stop="handleDownload(state.formInfo.imageUrl)"
+                            @click.stop="handleDownload(state.formInfo.imgUrl)"
                           >
                             <el-icon><Download /></el-icon>
                           </span> -->
                           <span
                             v-if="!disabled"
                             class="el-upload-list__item-delete"
-                            @click.stop="handleRemove(state.formInfo.imageUrl)"
+                            @click.stop="handleBgRemove(state.formInfo.imgUrl)"
                           >
                             <el-icon><Delete /></el-icon>
                           </span>
@@ -64,12 +53,135 @@
                       </li>
                     </ul>
                   </div>
-                  <el-icon v-else class="upload-icon"><span class="iconfont icon-cloud-upload" style="font-size:18px;"></span></el-icon>
+                  <el-icon v-else class="upload-icon">
+                    <span class="iconfont icon-cloud-upload" style="font-size:18px;"></span>
+                    <span>背景</span>
+                  </el-icon>
+                </el-upload>
+                <el-upload
+                  class="upload-boarder"
+                  style="margin-left:20px"
+                  :action="UPDATE_URL"
+                  :headers="{'tenant-id':1}"
+                  :limit="1"
+                  :show-file-list="false"
+                  :before-upload="beforeImgUpload"
+                  :on-success="handleImgSuccess"
+                >
+                  <!-- <img v-if="state.formInfo.imgUrl" :src="state.formInfo.imgUrl" class="avatar" /> -->
+                  <div v-if="state.formInfo.imgUrl">
+                    <ul class="el-upload-list el-upload-list--picture-card">
+                      <li class="el-upload-list__item is-ready">
+                        <img class="el-upload-list__item-thumbnail" :src="state.formInfo.imgUrl" alt="" />
+                        <span class="el-upload-list__item-actions">
+                          <span
+                            class="el-upload-list__item-preview"
+                            @click.stop="handlePictureCardPreview(state.formInfo.imgUrl)"
+                          >
+                            <el-icon><zoom-in /></el-icon>
+                          </span>
+                          <!-- <span
+                            v-if="!disabled"
+                            class="el-upload-list__item-delete"
+                            @click.stop="handleDownload(state.formInfo.imgUrl)"
+                          >
+                            <el-icon><Download /></el-icon>
+                          </span> -->
+                          <span
+                            v-if="!disabled"
+                            class="el-upload-list__item-delete"
+                            @click.stop="handleRemove(state.formInfo.imgUrl)"
+                          >
+                            <el-icon><Delete /></el-icon>
+                          </span>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                  <el-icon v-else class="upload-icon">
+                    <span class="iconfont icon-cloud-upload" style="font-size:18px;"></span>
+                    <span style="color:red">*</span><span>产品</span>
+                  </el-icon>
                 </el-upload>
               </el-form-item>
-              <el-form-item label="抠&#12288;图" prop="isSegmentation" >
-                  <el-switch v-model="state.formInfo.isSegmentation" />
+
+              <el-form-item label="背景描述(Prompt)：" prop="prompt" >
+                <el-input v-model="state.formInfo.prompt" type="textarea" :rows="3" />
               </el-form-item>
+              <el-form-item label="背景描述(NegativePrompt)：" prop="negativePrompt" >
+                <el-input v-model="state.formInfo.negativePrompt" type="textarea" :rows="5" />
+              </el-form-item>
+              
+              <el-form-item label="海报个数：" prop="imgNumber" >
+                <el-slider v-model="state.formInfo.imgNumber" :min="1" :max="4" :step="1" show-input size="small" style="width: 260px" />
+              </el-form-item>
+
+              <el-form-item label="海报大小：" prop="imgNumber" >
+                <el-radio-group v-model="state.formInfo.posterSizeType" label="">
+                  <el-radio :value="1">手机海报(9:16)540*960</el-radio>
+                  <el-radio :value="2">电商主图(3:4)750*1000</el-radio>
+                  <el-radio :value="3">公众号首图(7:3)1800*766</el-radio>
+                  <el-radio :value="0">自定义</el-radio>
+                </el-radio-group>
+                <div v-if="state.formInfo.posterSizeType == 0" class="custom_size">
+                  <el-input
+                    v-model="state.formInfo.pageWidth"
+                    style="width: 110px"
+                    placeholder="宽度"
+                  >
+                    <template #prepend>宽</template>
+                  </el-input>
+                  <el-input
+                    v-model="state.formInfo.pageHeight"
+                    style="width: 110px"
+                    placeholder="高度"
+                  >
+                    <template #prepend>高</template>
+                  </el-input>
+                </div>
+              </el-form-item>
+
+              <el-form-item label="产品位置：" prop="widgetPosition" >
+                <el-input
+                  v-model="state.formInfo.left"
+                  style="width: 110px"
+                  placeholder="X"
+                >
+                  <template #prepend>X</template>
+                </el-input>
+                <el-input
+                  v-model="state.formInfo.top"
+                  style="width: 110px"
+                  placeholder="Y"
+                >
+                  <template #prepend>Y</template>
+                </el-input>
+                <el-input
+                  v-model="state.formInfo.width"
+                  style="width: 110px"
+                  placeholder="高度"
+                >
+                  <template #prepend>H</template>
+                </el-input>
+                <el-input
+                  v-model="state.formInfo.height"
+                  style="width: 110px"
+                  placeholder="宽度"
+                >
+                  <template #prepend>W</template>
+                </el-input>
+              </el-form-item>
+
+              <el-form-item label="StopAt：" prop="stopAt" >
+                <el-slider v-model="state.formInfo.stopAt" :min="0" :max="1" :step="0.1" show-input size="small" style="width: 260px"/>
+              </el-form-item>
+              <el-form-item label="Weight：" prop="weight" >
+                <el-slider v-model="state.formInfo.weight" :min="0" :max="2" :step="0.1" show-input size="small" style="width: 260px" />
+              </el-form-item>
+              <el-form-item label="Guidance Scale：" prop="guidanceScale" >
+                <el-slider v-model="state.formInfo.guidanceScale" :min="0" :max="20" :step="0.1" show-input size="small" style="width: 260px" />
+              </el-form-item>
+
             </el-form>
           </div>
           <div class="aside-footer">
@@ -115,7 +227,7 @@
     </el-container>
   </div>
   <el-dialog v-model="dialogVisible">
-    <img w-full :src="dialogImageUrl" alt="Preview Image" />
+    <img w-full :src="dialogimgUrl" alt="Preview Image" />
   </el-dialog>
 </template>
 
@@ -128,10 +240,21 @@ import api from '@/api'
 
 const state = reactive({
   formInfo: {
-    bizName: '食品',
-    keyword: '通用',
-    imageUrl: '',
-    isSegmentation: false,
+    pageBgImg: '',
+    imgUrl: '',
+    prompt: 'close shot, minimalism, professional, high-resolution, commercial, highly detaile',
+    negativePrompt: '(text:1.5), (watermark:1.5), cartoon, anime, sketch, grayscale, dull, overexposed, cluttered, ((text,watermark)),((hand,person,foot))',
+    imgNumber: 1,
+    posterSizeType: 1,
+    pageWidth: 0,
+    pageHeight: 0,
+    left : 0,
+    top : 0,
+    width: 480,
+    height: 480,
+    stopAt: 0.8,
+    weight: 0.9,
+    guidanceScale: 6,
   },
   generateList:[],
   isGenerateFinish: true,
@@ -163,17 +286,15 @@ onMounted(() => {
   // ]
 })
 
-
-// 可以直接侦听一个 ref
-const selectKeywords = ref(['通用'])
-const keywords = ['通用', '简约', '中国风', '科技风', '动感', '带货', '年轻人', '老人'
-,'节日', '电商', '清新', '浪漫', '夏日凉爽', '暖色调', '冷色调', '可爱', '展台', '炫彩渐变', '便签笔记']
-watch(selectKeywords, (newVal, oldVal) => {
-  state.formInfo.keyword = newVal.join(",")
+// 监听图片数
+let imgNumber = ref(1)
+watch(imgNumber, (newVal, oldVal) => {
+  state.formInfo.imgNumber = newVal
+  state.generateList = state.generateList.slice(0,newVal)
 })
 
 // 图片上传
-const dialogImageUrl = ref('')
+const dialogimgUrl = ref('')
 const dialogVisible = ref(false)
 const disabled = ref(false)
 const UPDATE_URL = app_config.POSTER_API_URL + "/ai-poster/poster/upload"
@@ -182,14 +303,14 @@ const UPDATE_URL = app_config.POSTER_API_URL + "/ai-poster/poster/upload"
 const ruleFormRef = ref<FormInstance>()
 
 // 表单提交
-const checkBiz = (rule: any, value: any, callback: any) => {
+const checkPrompt = (rule: any, value: any, callback: any) => {
   if (!value) {
     return callback(new Error('请输入行业信息'))
   }
   callback()
 }
 
-const validateKeyword = (rule: any, value: any, callback: any) => {
+const validateNegPrompt = (rule: any, value: any, callback: any) => {
   if (!value) {
     return callback(new Error('请输入关键词'))
   }
@@ -200,7 +321,45 @@ const validateKeyword = (rule: any, value: any, callback: any) => {
 }
 
 const rules = reactive<FormRules<typeof state.formInfo>>({
-  bizName: [{ validator: checkBiz, trigger: 'blur' }],
+  pageBgImg: [
+    {
+      required: false,
+      message: '请设置背景图',
+      trigger: 'change',
+    },
+  ],
+  imgUrl: [
+    {
+      required: true,
+      message: '请设置产品图',
+      trigger: 'change',
+    },
+  ],
+  prompt: [
+    {
+      required: true,
+      message: '请设置正向描述',
+      validator: checkPrompt, 
+      trigger: 'blur' 
+    },
+  ],
+  negativePrompt: [
+    {
+      required: true,
+      message: '请设置负向描述',
+      validator: validateNegPrompt, 
+      trigger: 'blur'
+    },
+  ],
+  imgNumber: [{required: false,}],
+  posterSizeType: [{required: false,}],
+  left: [{required: false,}],
+  top: [{required: false,}],
+  width: [{required: false,}],
+  height: [{required: false,}],
+  stopAt: [{required: false,}],
+  weight: [{required: false,}],
+  guidanceScale: [{required: false,}],
 })
 
 const resetForm = (formEl: FormInstance | undefined) => {
@@ -208,12 +367,24 @@ const resetForm = (formEl: FormInstance | undefined) => {
   formEl.resetFields()
 }
 
+const handleBgImgSuccess: UploadProps['onSuccess'] = (
+  response,
+  uploadFile
+) => {
+  if(response.code == 0){
+    state.formInfo.pageBgImg = response.data
+  }else{
+    ElMsg.error('图片上传服务器失败，请删除重试!')
+    return false
+  }
+}
+
 const handleImgSuccess: UploadProps['onSuccess'] = (
   response,
   uploadFile
 ) => {
   if(response.code == 0){
-    state.formInfo.imageUrl = response.data
+    state.formInfo.imgUrl = response.data
   }else{
     ElMsg.error('图片上传服务器失败，请删除重试!')
     return false
@@ -230,12 +401,15 @@ const beforeImgUpload: UploadProps['beforeUpload'] = (rawFile) => {
   }
   return true
 }
+const handleBgRemove = (file: string) => {
+  state.formInfo.pageBgImg = ""
+}
 const handleRemove = (file: string) => {
-  state.formInfo.imageUrl = ""
+  state.formInfo.imgUrl = ""
 }
 
 const handlePictureCardPreview = (url: string) => {
-  dialogImageUrl.value = url!
+  dialogimgUrl.value = url!
   dialogVisible.value = true
 }
 
@@ -269,12 +443,16 @@ function testUpload(){
 }
 
 function submitForm(formEl: FormInstance | undefined) {
+  setTimeout(() => {
+    ElMsg.error('系统异常请重试!')
+  }, 600)
+  return
   if (!formEl) return
   formEl.validate(async (valid) => {
     if (valid) {
       state.isGenerateFinish = false
       initLoadingState()
-      const data = await api.poster.poster_generate(state.formInfo)
+      const data = await api.poster.poster_generate_plus(state.formInfo)
       if(!data.code){
         state.generateList = data;
         state.generateList.forEach((item:any) => {
@@ -851,7 +1029,28 @@ function designPoster(id: any) {
   font-size: 12px;
 }
 
-// /deep/ .el-form-item__label{
+.aside-main /deep/ .el-slider .el-slider__input{
+  width: 83px !important;
+}
+.aside-main /deep/ .el-slider .el-slider__input .el-input--small .el-input__wrapper{
+  padding-left: 28px !important;
+}
+
+.aside-main /deep/ .el-form-item__content .el-input-group__prepend{
+  font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace !important;
+}
+
+.aside-main /deep/ .el-form-item__content .el-input-group--prepend:nth-child(even){
+  margin-left: 14px;
+}
+.aside-main /deep/ .el-form-item__content .el-input-group--prepend:nth-child(n+3){
+  margin-top: 8px;
+}
+
+.custom_size .el-input__suffix-inner{
+  display: none;
+}
+// :deep() .el-form-item__label{
   // font-size: 14px !important;
 // }
 </style>

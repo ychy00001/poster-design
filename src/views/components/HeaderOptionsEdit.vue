@@ -64,8 +64,8 @@ const router = useRouter()
 const store = useStore()
 const canvasImage = ref<typeof SaveImage | null>(null)
 const {
-  dTitle, dBizName, dKeyword, dPage, dWidgets, tempEditing, dHistory, dPageHistory
-} = useSetupMapGetters(['dTitle', 'dBizName', 'dKeyword','dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory'])
+  dTemplateInfo, dPage, dWidgets, tempEditing, dHistory, dPageHistory
+} = useSetupMapGetters(['dTemplateInfo','dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory'])
 
 const state = reactive<TState>({
   stateVar: 0,
@@ -78,10 +78,10 @@ const state = reactive<TState>({
 
 const inputTitle = computed({
   get(){
-    return dTitle.value
+    return dTemplateInfo.value.title
   },
   set(value){
-    store.commit('setDTitle', value)
+    store.commit('setDTemplateInfo', { key: "title", value}) 
   }
 })
 
@@ -126,9 +126,9 @@ async function save(hasCover: boolean = false, isProcess: boolean) {
     emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
   }
   const updateResult = await api.poster.update({ id, 
-      title: dTitle.value || '未命名设计', 
-      bizName: dBizName.value,
-      keyword: dKeyword.value,
+      title: dTemplateInfo.value.title || '未命名设计', 
+      bizName: dTemplateInfo.value.bizName,
+      keyword: dTemplateInfo.value.keywords,
       templateId: state.templateId, 
       cover, 
       data: JSON.stringify({ page: dPage.value, widgets }), 
@@ -223,9 +223,9 @@ async function load(id: any, tempId: any, type: any, cb: Function) {
   if (content) {
     const data = JSON.parse(content)
     state.stateVar = status
-    store.commit('setDTitle', title) 
-    store.commit('setDBizName', bizName) 
-    store.commit('setDKeyword', keyword)
+    store.commit('setDTemplateInfo', { key: "title", title}) 
+    store.commit('setDTemplateInfo', { key: "bizName", bizName}) 
+    store.commit('setDTemplateInfo', { key: "keywords", keyword}) 
     state.templateId = templateId
     state.cover = cover
     store.commit('setShowMoveable', false) // 清理掉上一次的选择框

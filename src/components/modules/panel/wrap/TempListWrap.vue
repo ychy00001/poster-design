@@ -62,7 +62,7 @@ const state = reactive<TState>({
   searchKeyword: '',
 })
 
-const { dEditTemplateId, tempEditing, dHistoryParams } = useSetupMapGetters(['dEditTemplateId','tempEditing', 'dHistoryParams'])
+const { dTemplateInfo, tempEditing, dHistoryParams } = useSetupMapGetters(['dTemplateInfo','tempEditing', 'dHistoryParams'])
 
 const pageOptions: TPageOptions = { pageNo: 0, pageSize: 20, cate: 1 }
 const { cate, edit } = route.query
@@ -101,7 +101,7 @@ const delTemplate = async(id:number) => {
   if (!id) return
   const res = await api.template.del({id})
   if(!res.code){
-    if(id == dEditTemplateId.value){
+    if(id == dTemplateInfo.value.templateId){
         // 当前选择的界面是删除的模版 移除选项，移除路由参数
         router.push({ path: '/design', replace: true })
         store.commit('setDPage', {
@@ -126,8 +126,13 @@ const delTemplate = async(id:number) => {
           ],
           record: {},
         })
-        store.commit('setDTitle', '')
-        store.commit('setDEditTemplateId', -1)
+        store.commit('setDTemplateInfo', {
+          templateId: -1,
+          keywords: "",
+          bizName: "",
+          title: "", 
+          aiParam: "",
+        })
         store.commit('setDWidgets', [])
         store.dispatch('setTemplate', [])
         store.dispatch('selectWidget', {
@@ -171,7 +176,7 @@ async function selectItem(item: IGetTempListData) {
   store.commit('managerEdit', false)
   store.commit('setDWidgets', [])
 
-  setTempId(item.id, item.keyword, item.bizName, item.title)
+  setTempId(item.id, item.keyword, item.bizName, item.title, item.aiParam)
 
   let result = null
   if (!item.data) {
@@ -217,12 +222,15 @@ async function selectItem(item: IGetTempListData) {
     // setTempStat({ id }: any, stat: string) {
     //   api.home.setTempStat({ id, stat })
     // },
-function setTempId(tempId: number | string, keywords: string, bizName: string, title: string) {
-    store.commit('setDEditTemplateId', tempId)
-    store.commit('setDKeyword', keywords)
-    store.commit('setDBizName', bizName)
-    store.commit('setDTitle', title)
-    router.push({ path: '/design', query: { tempid: tempId }, replace: true })
+function setTempId(tempId: number | string, keywords: string, bizName: string, title: string, aiParam: string) {
+  store.commit('setDTemplateInfo', {
+    templateId: tempId,
+    keywords,
+    bizName,
+    title, 
+    aiParam,
+  })
+  router.push({ path: '/design', query: { tempid: tempId }, replace: true })
 }
 
 defineExpose({

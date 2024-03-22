@@ -8,11 +8,14 @@
     </div>
     <el-collapse v-else v-model="activeNames">
       <el-collapse-item v-if="isDesign" title="元数据" name="1">
-        <div class="position-size">
-          <text-select v-model="bizName" :options="bizNameOptions" label="类型" @finish="(value) => changeBizName(value)"  />
+        <div class="meta-item">
+          <text-select v-model="bizName" :options="bizNameOptions" label="类型" @finish="(value) => changeTemplateInfo('bizName', value)"  />
         </div>
-        <div class="position-size">
-          <text-input-area v-model="keyword" label="关键词" :max="100" @finish="(value) => changeKeyword(value)" />
+        <div class="meta-item">
+          <text-input-area v-model="keyword" label="关键词" :htmlContentType="false" :rows="2" :max="100" @finish="(value) => changeTemplateInfo('keywords', value)" />
+        </div>
+        <div class="meta-item">
+          <text-input-area style="margin-top:5px" v-model="aiParam" label="AI参数" :htmlContentType="false" :rows="5" :max="1000" @finish="(value) => changeTemplateInfo('aiParam', value)" />
         </div>
       </el-collapse-item>
       <el-collapse-item title="画布尺寸" name="2">
@@ -74,6 +77,7 @@ export default {
       showBgLib: false,
       keyword: '',
       bizName: '',
+      aiParam: '',
       bizNameOptions: [
         {
           value: '食品',
@@ -83,7 +87,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['dBizName', 'dKeyword','dActiveElement']),
+    ...mapGetters(['dTemplateInfo','dActiveElement']),
     isDesign(){
       return this.$route.name === 'Design'
     }
@@ -106,7 +110,7 @@ export default {
     this.change()
   },
   methods: {
-    ...mapActions(['updatePageData', 'setDKeyword', 'setDBizName']),
+    ...mapActions(['updatePageData', 'dTemplateInfo']),
     colorChange(e) {
       if (e.mode === '渐变') {
         // setTimeout(() => {
@@ -125,18 +129,17 @@ export default {
       }
     },
     change() {
-      this.keyword = this.dKeyword
-      this.bizName = this.dBizName
+      this.keyword = this.dTemplateInfo.keywords
+      this.bizName = this.dTemplateInfo.bizName
+      console.log(this.dTemplateInfo)
+      this.aiParam = this.dTemplateInfo.aiParam
       this.mode = this.modes[0]
       this.tag = true
       this.innerElement = JSON.parse(JSON.stringify(this.dActiveElement))
       this.innerElement.backgroundImage && (this.mode = this.modes[1])
     },
-    changeKeyword(value){
-      this.$store.commit('setDKeyword', value) 
-    },
-    changeBizName(value){
-      this.$store.commit('setDBizName', value) 
+    changeTemplateInfo(key, value){
+      this.$store.commit('setDTemplateInfoValue', { key, value}) 
     },
     changeValue() {
       if (this.tag) {
@@ -252,4 +255,5 @@ export default {
       }
     }
 }
+
 </style>

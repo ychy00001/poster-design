@@ -11,7 +11,7 @@
     <div :class="{ 'input-wrap': true, active: inputBorder }">
       <textarea
         :maxlength="max" :class="{ 'real-input': true, disable: !editable }" 
-        type="text" rows="3" :value="dealValue" 
+        type="text" :rows="rows" :value="dealValue" 
         :readonly="!editable" @input="updateValue(($event.target as HTMLTextAreaElement).value)"
         @focus="focusInput" @blur="blurInput"
       />
@@ -29,6 +29,8 @@ type TProps = {
   modelValue?: string
   editable?: boolean
   max?: string
+  rows?: number
+  htmlContentType: boolean
 }
 
 type TEmits = {
@@ -40,6 +42,8 @@ const props = withDefaults(defineProps<TProps>(), {
   label: '',
   modelValue: '',
   editable: true,
+  rows: 3,
+  htmlContentType: true
 })
 
 const emit = defineEmits<TEmits>()
@@ -51,7 +55,11 @@ const dealValue = computed(() => {
 })
 
 function updateValue(value: string) {
-  emit('update:modelValue', getValue(value))
+  if(props.htmlContentType){
+    emit('update:modelValue', getValue(value))
+  }else{
+    emit('update:modelValue', value)
+  }
 }
 
 function focusInput() {
@@ -67,7 +75,8 @@ function blurInput() {
   }
 }
 function getValue(value: string) {
-  return value.replace(/\n|\r\n/g, '<br/>').replace(/ /g, '&nbsp;')
+  return value;
+  // return value.replace(/\n|r\n/g, '<br/>').replace(/ /g, '&nbsp;')
 }
 </script>
 

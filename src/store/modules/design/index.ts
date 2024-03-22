@@ -83,10 +83,13 @@ const all = {
     updateSelect: null, // 强制设置选择元素
     dCropUuid: -1, // 正在编辑or裁剪的组件id
     // dDragInitData: {}, // 拖拽初始化数据
-    dEditTemplateId: -1,
-    dKeyword: "",
-    dBizName: "",
-    dTitle: ""
+    dTemplateInfo: {
+      templateId: -1,
+      keywords: "",
+      bizName: "",
+      title: "",
+      aiParam: ""
+    }
   },
   getters: {
     selectItem(state: any) {
@@ -185,18 +188,9 @@ const all = {
     // dDragInitData(state: any) {
     //   return state.dDragInitData
     // },
-    dEditTemplateId(state: any) {
-      return state.dEditTemplateId
-    },
-    dKeyword(state: any) {
-      return state.dKeyword
-    },
-    dBizName(state: any) {
-      return state.dBizName
-    },
-    dTitle(state: any) {
-      return state.dTitle
-    },
+    dTemplateInfo(state:any){
+      return state.dTemplateInfo
+    }
   },
   mutations: {
     ...mutations,

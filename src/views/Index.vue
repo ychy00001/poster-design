@@ -73,12 +73,18 @@ export default defineComponent({
         },
         {
           id: 2,
+          path: "/plus",
+          authName: "高级",
+          children: []
+        },
+        {
+          id: 3,
           path: "/list",
           authName: "海报",
           children: []
         },
         {
-          id: 3,
+          id: 4,
           path: "/design",
           authName: "设计",
           children: []
@@ -86,10 +92,10 @@ export default defineComponent({
       ],
       iconsObj: {
         1: 'iconfont icon-home',
-        2: 'iconfont icon-project',
-        3: 'iconfont icon-skin',
-        4: 'iconfont icon-thunderbolt',
-        5: 'iconfont icon-fire'
+        2: 'iconfont icon-fire',
+        3: 'iconfont icon-project',
+        4: 'iconfont icon-skin',
+        5: 'iconfont icon-thunderbolt',
       },
       // 是否折叠
       isCollapse: false

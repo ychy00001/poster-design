@@ -11,14 +11,13 @@
     <template v-if="tempEditing">
       <!-- <span style="color: #999; font-size: 14px; margin-right: 0.5rem">{{ state.stateVar ? '启用' : '停用' }}</span> <el-switch v-model="state.stateVar" @change="stateChange" /> -->
       <div class="divide__line">|</div>
-      <el-button  plain type="primary" @click="saveTemp">保存模板1111</el-button>
+      <el-button  plain type="primary" @click="saveTemp(true,true)">保存模板1111</el-button>
       <el-button @click="$store.commit('managerEdit', false)">取消</el-button>
       <div class="divide__line">|</div>
     </template>
     <!-- <el-button @click="draw">绘制(测试)</el-button> -->
-    <!-- <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false, true)">保存模板</el-button> -->
-    <el-button v-if="dEditTemplateId && dEditTemplateId > 0" :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true, true)">另存模板</el-button>
-    <el-button :loading="loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false,true)">保存模版</el-button>
+    <el-button v-if="dTemplateInfo.templateId && dTemplateInfo.templateId > 0" :loading="state.loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(true, true)">另存模板</el-button>
+    <el-button :loading="state.loading" size="large" class="primary-btn" :disabled="tempEditing" @click="saveTemp(false,true)">保存模版</el-button>
     <copyRight>
       <el-button :loading="state.loading" size="large" class="primary-btn" :disabled="tempEditing" plain type="primary" @click="download">下载作品</el-button>
     </copyRight>
@@ -64,8 +63,8 @@ const router = useRouter()
 const store = useStore()
 const canvasImage = ref<typeof SaveImage | null>(null)
 const {
-  dTitle, dBizName, dKeyword, dEditTemplateId, dPage, dWidgets, tempEditing, dHistory, dPageHistory
-} = useSetupMapGetters(['dTitle', 'dBizName', 'dKeyword', 'dEditTemplateId','dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory'])
+  dTemplateInfo, dPage, dWidgets, tempEditing, dHistory, dPageHistory
+} = useSetupMapGetters(['dTemplateInfo', 'dPage', 'dWidgets', 'tempEditing', 'dHistory', 'dPageHistory'])
 
 const state = reactive<TState>({
   stateVar: 0,
@@ -75,15 +74,25 @@ const state = reactive<TState>({
 
 onMounted(() => {
   const { tempid, tempType: type } = route.query
-  store.commit('setDEditTemplateId', tempid)
+  if( tempid ){
+    store.commit('setDTemplateInfoValue', {
+        key:'templateId', 
+        value: tempid
+      }
+    )
+  }
 })
 
 const inputTitle = computed({
   get(){
-    return dTitle.value
+    return dTemplateInfo.value.title
   },
   set(value){
-    store.commit('setDTitle', value)
+    store.commit('setDTemplateInfoValue', {
+        key:'title', 
+        value: value
+      }
+    )
   }
 })
 
@@ -145,33 +154,35 @@ async function saveTemp(isCreate:boolean, showProcess: boolean) {
       clearInterval(animation)
       emit('change', { downloadPercent: 75, downloadText: '正在提交保存' })
     }
-    if(dEditTemplateId.value > 0 && !isCreate){
+    if(dTemplateInfo.value.templateId > 0 && !isCreate){
       res = await api.template.update(
       {
-        id: dEditTemplateId.value,
-        title: dTitle.value || '未命名模板',
-        bizName: dBizName.value,
-        keyword: dKeyword.value,
+        id: dTemplateInfo.value.templateId,
+        title: dTemplateInfo.value.title || '未命名模板',
+        bizName: dTemplateInfo.value.bizName,
+        keyword: dTemplateInfo.value.keywords,
         cover: cover,
         data: JSON.stringify({ page: dPage.value, widgets: dWidgets.value }),
         width: dPage.value.width,
         height: dPage.value.height,
+        aiParam: dTemplateInfo.value.aiParam,
         status: 1
       })
     }else{
       res = await api.template.create(
       {
-          title: dTitle.value || '未命名模板',
-          bizName: dBizName.value,
-          keyword: dKeyword.value,
+          title: dTemplateInfo.value.title || '未命名模板',
+          bizName: dTemplateInfo.value.bizName,
+          keyword: dTemplateInfo.value.keywords,
           cover: cover,
           data: JSON.stringify({ page: dPage.value, widgets: dWidgets.value }),
           width: dPage.value.width,
           height: dPage.value.height,
+          aiParam: dTemplateInfo.value.aiParam,
           status: 1
       })
       if (!res.code){
-        store.commit('setDEditTemplateId', res)
+        store.commit('setDTemplateInfo', { key:"templateId", value:res}) 
         router.push({ path: '/design', query: { tempid: res }, replace: true })
       }
     }
@@ -205,7 +216,7 @@ async function download() {
   state.loading = true
   emit('update:modelValue', true)
   emit('change', { downloadPercent: 1, downloadText: '正在处理封面' })
-  if(dEditTemplateId.value){
+  if(dTemplateInfo.value.templateId){
     await saveTemp(false, false)
   }else{
     await saveTemp(true, false)
@@ -250,22 +261,23 @@ async function load(id: number, tempId: number, type: number, cb: () => void) {
   if (route.name !== 'Draw') {
     await useFontStore.init() // 初始化加载字体
   }
-  if(tempId){
-    store.commit('setDEditTemplateId', tempId)
-  }
   const apiName = tempId && !id ? 'template' : 'poster'
   if (!id && !tempId) {
     cb()
     return
   }
-  const { data: content, title, status, width, height, bizName, keyword  } = await api[apiName].get({ id: id || tempId})
+  const { data: content, title, status, width, height, bizName, keyword, aiParam  } = await api[apiName].get({ id: id || tempId})
   if (content) {
     const data = JSON.parse(content)
     state.stateVar = status
     state.title = title
-    store.commit('setDTitle', title)
-    store.commit('setDBizName', bizName)
-    store.commit('setDKeyword', keyword)
+    store.commit('setDTemplateInfo', {
+      templateId: tempId,
+      keywords: keyword,
+      bizName,
+      title, 
+      aiParam,
+    })
     store.commit('setShowMoveable', false) // 清理掉上一次的选择框
     if (type == 1) {
       // 加载文字组合组件

@@ -75,16 +75,10 @@ export default {
   // setDragInitData(state: Type.Object, data: any) {
   //   state.dDragInitData = data
   // },
-  setDEditTemplateId(state: Type.Object, e: any) {
-    state.dEditTemplateId = e
+  setDTemplateInfo(state: Type.Object, { templateId, keywords, bizName, title , aiParam}: Type.Object) {
+    state.dTemplateInfo = {templateId, keywords, bizName, title, aiParam}
   },
-  setDKeyword(state: Type.Object, e: any) {
-    state.dKeyword = e
-  },
-  setDBizName(state: Type.Object, e: any) {
-    state.dBizName = e
-  },
-  setDTitle(state: Type.Object, e: any) {
-    state.dTitle = e
+  setDTemplateInfoValue(state: Type.Object, { key, value } : Type.Object) {
+    state.dTemplateInfo[key] = value
   },
 }

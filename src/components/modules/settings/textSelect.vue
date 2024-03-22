@@ -27,48 +27,35 @@
   </div>
 </template>
 
-<script>
-// 文本输入组件
-const NAME = 'text-select'
+<script lang="ts" setup>
+import { ref, computed } from 'vue'
 
-export default {
-  name: NAME,
-  props: {
-    options: {
-      default: []
-    },
-    label: {
-      default: '',
-    },
-    modelValue: {
-      default: false,
-    },
-    placeholder: {
-      default: '',
-    },
-    disabled: {
-      default: false,
-    },
-  },
-  emits: ['finish'],
-  data() {
-    return {
-      innerValue: ''
-    }
-  },
-  computed: {
-  },
-  created(){
-    this.innerValue = this.modelValue 
-  },
-  mounted(){
-    console.log(this.modelValue)
-  },
-  methods: {
-    changeValue(value) {
-      this.$emit('finish', value)
-    },
-  },
+type TProps = {
+  options: any
+  label?: string
+  modelValue?: string
+  placeholder?: string
+  disabled?: boolean
+}
+type TEmits = {
+  (event: 'finish', data: string): void
+}
+
+const emit = defineEmits<TEmits>()
+const props = withDefaults(defineProps<TProps>(), {
+  options: [],
+  label: '',
+  modelValue: '',
+  placeholder: '',
+  disabled: false,
+})
+
+const innerValue = computed(() => {
+  return props.modelValue
+})
+
+function changeValue(value) {
+  emit('finish', value)
 }
 </script>
 

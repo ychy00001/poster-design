@@ -41,6 +41,7 @@ export type IGetTempListData = {
   url: string
   model?: string
   color?: string
+  aiParam: string
 }
 type IGetTempListResult = TPageRequestResult<IGetTempListData[]>
 
