@@ -242,8 +242,8 @@ const state = reactive({
   formInfo: {
     pageBgImg: '',
     imgUrl: '',
-    prompt: 'close shot, minimalism, professional, high-resolution, commercial, highly detaile',
-    negativePrompt: '(text:1.5), (watermark:1.5), cartoon, anime, sketch, grayscale, dull, overexposed, cluttered, ((text,watermark)),((hand,person,foot))',
+    prompt: 'on the table, warm-toned, with simple and clean background',
+    negativePrompt: '(worst quality, low quality, normal quality, lowres, low details, oversaturated, undersaturated, overexposed, underexposed, grayscale, bw, bad photo, bad photography, bad art:1.4), (watermark, signature, text font, username, error, logo, words, letters, digits, autograph, trademark, name:1.2), (blur, blurry, grainy), morbid, ugly, asymmetrical, mutated malformed, mutilated, poorly lit, bad shadow, draft, cropped, out of frame, cut off, censored, jpeg artifacts, out of focus, glitch, duplicate, (bad hands, bad anatomy, bad body, bad face, bad teeth, bad arms, bad legs, deformities:1.3)',
     imgNumber: 1,
     posterSizeType: 1,
     pageWidth: 0,
