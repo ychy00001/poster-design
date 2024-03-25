@@ -81,7 +81,7 @@ const inputTitle = computed({
     return dTemplateInfo.value.title
   },
   set(value){
-    store.commit('setDTemplateInfo', { key: "title", value}) 
+    store.commit('setDTemplateInfoValue', { key: "title", value}) 
   }
 })
 
@@ -223,9 +223,7 @@ async function load(id: any, tempId: any, type: any, cb: Function) {
   if (content) {
     const data = JSON.parse(content)
     state.stateVar = status
-    store.commit('setDTemplateInfo', { key: "title", title}) 
-    store.commit('setDTemplateInfo', { key: "bizName", bizName}) 
-    store.commit('setDTemplateInfo', { key: "keywords", keyword}) 
+    store.commit('setDTemplateInfo', { title, bizName, keywords: keyword}) 
     state.templateId = templateId
     state.cover = cover
     store.commit('setShowMoveable', false) // 清理掉上一次的选择框

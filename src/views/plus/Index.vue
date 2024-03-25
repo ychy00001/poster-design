@@ -287,11 +287,12 @@ onMounted(() => {
 })
 
 // 监听图片数
-let imgNumber = ref(1)
-watch(imgNumber, (newVal, oldVal) => {
-  state.formInfo.imgNumber = newVal
-  state.generateList = state.generateList.slice(0,newVal)
-})
+// let imgNumber = ref(1)
+// watch(imgNumber, (newVal, oldVal) => {
+//   state.formInfo.imgNumber = newVal
+//   genGenList(newVal)
+//   console.log(state.generateList)
+// })
 
 // 图片上传
 const dialogimgUrl = ref('')
@@ -443,15 +444,11 @@ function testUpload(){
 }
 
 function submitForm(formEl: FormInstance | undefined) {
-  setTimeout(() => {
-    ElMsg.error('系统异常请重试!')
-  }, 600)
-  return
   if (!formEl) return
   formEl.validate(async (valid) => {
     if (valid) {
       state.isGenerateFinish = false
-      initLoadingState()
+      genGenList(state.formInfo.imgNumber)
       const data = await api.poster.poster_generate_plus(state.formInfo)
       if(!data.code){
         state.generateList = data;
@@ -467,9 +464,12 @@ function submitForm(formEl: FormInstance | undefined) {
   })
 }
 
-function initLoadingState(){
+function genGenList(size){
+  if(size > 4){
+    size = 4;
+  }
   //genState 0 成功，1 生成中，2 排队中
-  state.generateList = [
+  let defaultList:any = [
     {
       id: 1,
       cover: "http://10.128.172.93:52710/cw-poster/images/normal/4669B9C2_5EAD7937.jpeg",
@@ -491,6 +491,7 @@ function initLoadingState(){
       genState: 2, // 排队中
     },
   ]
+  state.generateList = defaultList.slice(0,size)
 }
 
 function designPoster(id: any) {
@@ -1047,7 +1048,7 @@ function designPoster(id: any) {
   margin-top: 8px;
 }
 
-.custom_size .el-input__suffix-inner{
+.custom_size /deep/ .el-input__suffix-inner{
   display: none;
 }
 // :deep() .el-form-item__label{
