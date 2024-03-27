@@ -31,7 +31,7 @@
       <span class="dialog-footer">
         <el-button v-show="state.rawImage && state.toolModel" @click="clear">清空重选</el-button>
         <el-button v-show="state.cutImage" type="primary" plain @click="edit">进入编辑模式</el-button>
-        <el-button v-show="state.cutImage && state.toolModel" type="primary" plain @click="download"> 下载 </el-button>
+        <el-button v-show="state.cutImage" type="primary" plain @click="download"> 下载 </el-button>
         <el-button v-show="state.cutImage && !state.toolModel" v-loading="state.loading" type="primary" plain @click="cutDone"> {{ state.loading ? '上传中..' : '完成抠图' }} </el-button>
       </span>
     </template>
