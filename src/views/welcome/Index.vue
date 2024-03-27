@@ -26,6 +26,7 @@
               </el-form-item>
               <el-form-item label="产品图" prop="产品图">
                 <el-upload
+                  ref="imgRef"
                   class="upload-boarder"
                   :action="UPDATE_URL"
                   :headers="{'tenant-id':1}"
@@ -173,6 +174,7 @@ watch(selectKeywords, (newVal, oldVal) => {
 })
 
 // 图片上传
+const imgRef = ref<any>(null)
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 const disabled = ref(false)
@@ -232,6 +234,7 @@ const beforeImgUpload: UploadProps['beforeUpload'] = (rawFile) => {
 }
 const handleRemove = (file: string) => {
   state.formInfo.imageUrl = ""
+  imgRef.value.clearFiles();
 }
 
 const handlePictureCardPreview = (url: string) => {
@@ -339,10 +342,11 @@ function designPoster(id: any) {
   font-weight: 800 !important;
 }
 
-.el-aside{
+.welcome .el-aside{
   border: solid 1px var(--el-border-color);
   height: 100%;
   font-family: Helvetica, Tahoma, Arial, “PingFang SC”, “Hiragino Sans GB”, “Heiti SC”, STXihei, “Microsoft YaHei”, SimHei, “WenQuanYi Micro Hei”;
+  width: 340px;
 }
 
 .aside-content{

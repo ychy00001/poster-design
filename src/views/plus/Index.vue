@@ -15,6 +15,7 @@
             >
               <el-form-item label="产品图：" prop="imgUrl">
                 <el-upload
+                  ref="imgBgRef"
                   class="upload-boarder"
                   :action="UPDATE_URL"
                   :headers="{'tenant-id':1}"
@@ -60,6 +61,7 @@
                 </el-upload>
                 <el-upload
                   class="upload-boarder"
+                  ref="imgRef"
                   style="margin-left:20px"
                   :action="UPDATE_URL"
                   :headers="{'tenant-id':1}"
@@ -314,6 +316,10 @@ const ruleFormRef = ref<FormInstance>()
 // 抠图
 const imageCutoutRef = ref<typeof imageCutout | null>(null)
 
+// 图片Ref 背景Ref
+const imgRef = ref<any>(null)
+const imgBgRef = ref<any>(null)
+
 // 表单提交
 const checkPrompt = (rule: any, value: any, callback: any) => {
   if (!value) {
@@ -396,6 +402,7 @@ const handleImgSuccess: UploadProps['onSuccess'] = (
   uploadFile
 ) => {
   if(response.code == 0){
+    console.log("上传产品图成功")
     state.formInfo.imgUrl = response.data
   }else{
     ElMsg.error('图片上传服务器失败，请删除重试!')
@@ -415,9 +422,11 @@ const beforeImgUpload: UploadProps['beforeUpload'] = (rawFile) => {
 }
 const handleBgRemove = (file: string) => {
   state.formInfo.pageBgImg = ""
+  imgBgRef.value.clearFiles();
 }
 const handleRemove = (file: string) => {
   state.formInfo.imgUrl = ""
+  imgRef.value.clearFiles();
 }
 
 const handlePictureCardPreview = (url: string) => {
@@ -548,10 +557,11 @@ function designPoster(id: any) {
   font-weight: 800 !important;
 }
 
-.el-aside{
+.welcome .el-aside{
   border: solid 1px var(--el-border-color);
   height: 100%;
   font-family: Helvetica, Tahoma, Arial, “PingFang SC”, “Hiragino Sans GB”, “Heiti SC”, STXihei, “Microsoft YaHei”, SimHei, “WenQuanYi Micro Hei”;
+  width: 340px;
 }
 
 .aside-content{
@@ -600,21 +610,21 @@ function designPoster(id: any) {
 }
 
 .upload-icon{
-  width:100px; 
+  width:110px; 
   height: 75px; 
   background-color: #f6f7f9; 
   border-radius: 10px;
 }
 
 .upload-icon:hover{
-  width:100px; 
+  width:110px; 
   height: 75px; 
   background-color: #EEEEEE; 
   border-radius: 10px;
 }
 
 .el-upload-list__item {
-  width:100px !important; 
+  width:110px !important; 
   height: 75px !important;
 }
 
