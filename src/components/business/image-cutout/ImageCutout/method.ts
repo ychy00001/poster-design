@@ -6,13 +6,13 @@
  * @Date: 2024-03-03 19:00:00
  */
 
-import Qiniu from '@/common/methods/QiNiu'
 import { TCommonUploadCb, TUploadErrorResult } from "@/api/ai"
 import { TImageCutoutState } from "./index.vue"
 import api from "@/api"
 import { getImage } from '@/common/methods/getImgDetail'
 import _config from '@/config'
 import { Ref } from 'vue'
+import { ElMessage as ElMsg } from 'element-plus'
 
 /** 选择图片 */
 export const selectImageFile = async (
@@ -34,7 +34,7 @@ export const selectImageFile = async (
   state.rawImage = URL.createObjectURL(file)
 
   // 返回抠图结果
-  const result = await api.ai.upload(file, (up: number, dp: number) => {
+  const result = await api.poster.segmentation(file, (up: number, dp: number) => {
     uploadCb && uploadCb(up, dp)
     if (dp) {
       state.progressText = dp === 100 ? '' : '导入中..'
@@ -55,12 +55,20 @@ export async function uploadCutPhotoToCloud(cutImage: string) {
     const buffer = await response.arrayBuffer()
     const file = new File([buffer], `cut_image_${Math.random()}.png`)
     // upload
-    const qnOptions = { bucket: 'xp-design', prePath: 'user' }
-    const result = await Qiniu.upload(file, qnOptions)
-    const { width, height } = await getImage(file)
-    const url = _config.IMG_URL + result.key
-    await api.material.addMyPhoto({ width, height, url })
-    return url
+    const url = await api.minio.fileUpload(file)
+    if(url){
+      const { width, height } = await getImage(file)
+      await api.material_new.create({
+        name: '我的抠图',
+        type: 2,
+        value: url,
+        width,
+        height
+      })
+      return url
+    }else{
+      ElMsg.error('图片上传服务器失败，请删除重试!')
+    }
   } catch(e) {
     console.error(`upload cut file error: msg: ${e}`)
     return ''

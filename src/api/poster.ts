@@ -23,6 +23,22 @@ export const file_upload = (file: File, cb: Function) => {
   return cw_fetch('/poster/upload', formData, 'post', {}, extra)
 }
 
+// 抠图
+export const segmentation = (file: File, cb: Function) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  const extra = {
+    responseType: 'blob',
+    onUploadProgress: (progress: any) => {
+      cb(Math.floor((progress.loaded / progress.total) * 100), 0)
+    },
+    onDownloadProgress: (progress: any) => {
+      cb(100, Math.floor((progress.loaded / progress.total) * 100))
+    },
+  }
+  return cw_fetch('/poster/segmentation', formData, 'post', {}, extra)
+}
+
 // 生成海报
 export const poster_generate = (params: Type.Object = {}) => cw_fetch('/poster/generate', params, 'post')
 

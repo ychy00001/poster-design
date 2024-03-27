@@ -55,7 +55,7 @@
                   </div>
                   <el-icon v-else class="upload-icon">
                     <span class="iconfont icon-cloud-upload" style="font-size:18px;"></span>
-                    <span>背景</span>
+                    <span>参考图</span>
                   </el-icon>
                 </el-upload>
                 <el-upload
@@ -74,6 +74,12 @@
                       <li class="el-upload-list__item is-ready">
                         <img class="el-upload-list__item-thumbnail" :src="state.formInfo.imgUrl" alt="" />
                         <span class="el-upload-list__item-actions">
+                          <span
+                            class="el-upload-list__item-cutup"
+                            @click.stop="openImageCutout(state.formInfo.imgUrl)"
+                          >
+                            <el-icon><i class="icon sd-AIkoutu" /></el-icon>
+                          </span>
                           <span
                             class="el-upload-list__item-preview"
                             @click.stop="handlePictureCardPreview(state.formInfo.imgUrl)"
@@ -100,7 +106,7 @@
                   </div>
                   <el-icon v-else class="upload-icon">
                     <span class="iconfont icon-cloud-upload" style="font-size:18px;"></span>
-                    <span style="color:red">*</span><span>产品</span>
+                    <span style="color:red">*</span><span>产品图</span>
                   </el-icon>
                 </el-upload>
               </el-form-item>
@@ -229,6 +235,7 @@
   <el-dialog v-model="dialogVisible">
     <img w-full :src="dialogimgUrl" alt="Preview Image" />
   </el-dialog>
+  <imageCutout ref="imageCutoutRef" @done="cutImageDone" />
 </template>
 
 <script lang="ts" setup>
@@ -237,23 +244,24 @@ import { defineComponent, reactive, toRefs , ref, onMounted, watch} from 'vue'
 import { ElMessage as ElMsg } from 'element-plus'
 import app_config from '@/config'
 import api from '@/api'
+import imageCutout from '@/components/business/image-cutout'
 
 const state = reactive({
   formInfo: {
     pageBgImg: '',
     imgUrl: '',
     prompt: 'on the table, warm-toned, with simple and clean background',
-    negativePrompt: '(worst quality, low quality, normal quality, lowres, low details, oversaturated, undersaturated, overexposed, underexposed, grayscale, bw, bad photo, bad photography, bad art:1.4), (watermark, signature, text font, username, error, logo, words, letters, digits, autograph, trademark, name:1.2), (blur, blurry, grainy), morbid, ugly, asymmetrical, mutated malformed, mutilated, poorly lit, bad shadow, draft, cropped, out of frame, cut off, censored, jpeg artifacts, out of focus, glitch, duplicate, (bad hands, bad anatomy, bad body, bad face, bad teeth, bad arms, bad legs, deformities:1.3)',
+    negativePrompt: '(worst quality, low quality, normal quality, lowres, low details, oversaturated, undersaturated, overexposed, underexposed, grayscale, bw, bad photo, bad photography, bad art:1.4), (watermark, signature, text font, username, error, logo, words, letters, digits, autograph, trademark, name:1.2), (blur, blurry, grainy), morbid, ugly, asymmetrical, mutated malformed, mutilated, poorly lit, bad shadow, draft, cropped, out of frame, cut off, censored, jpeg artifacts, out of focus, glitch, duplicate, (bad hands, bad anatomy, bad body, bad face, bad teeth, bad arms, bad legs,(hand: 1.3) deformities:1.3)',
     imgNumber: 1,
     posterSizeType: 1,
     pageWidth: 0,
     pageHeight: 0,
-    left : 0,
-    top : 0,
+    left : 50,
+    top : 450,
     width: 480,
     height: 480,
-    stopAt: 0.8,
-    weight: 0.9,
+    stopAt: 0.5,
+    weight: 0.7,
     guidanceScale: 6,
   },
   generateList:[],
@@ -302,6 +310,9 @@ const UPDATE_URL = app_config.POSTER_API_URL + "/ai-poster/poster/upload"
 
 // 表单上传
 const ruleFormRef = ref<FormInstance>()
+
+// 抠图
+const imageCutoutRef = ref<typeof imageCutout | null>(null)
 
 // 表单提交
 const checkPrompt = (rule: any, value: any, callback: any) => {
@@ -463,6 +474,25 @@ function submitForm(formEl: FormInstance | undefined) {
     }
   })
 }
+ // 打开抠图
+ function openImageCutout(img: string) {
+  fetch(img)
+    .then((response) => response.blob())
+    .then((blob) => {
+      const file = new File([blob], `image_${Math.random()}.jpg`, { type: 'image/jpeg' })
+      imageCutoutRef.value?.open(file)
+    })
+    .catch((error) => {
+      console.error('获取图片失败:', error)
+    })
+}
+
+// 完成抠图
+async function cutImageDone(url: string) {
+  setTimeout(() => {
+    state.formInfo.imgUrl = url
+  }, 300)
+}
 
 function genGenList(size){
   if(size > 4){
@@ -570,24 +600,27 @@ function designPoster(id: any) {
 }
 
 .upload-icon{
-  width:75px; 
+  width:100px; 
   height: 75px; 
   background-color: #f6f7f9; 
   border-radius: 10px;
 }
 
 .upload-icon:hover{
-  width:75px; 
+  width:100px; 
   height: 75px; 
   background-color: #EEEEEE; 
   border-radius: 10px;
 }
 
 .el-upload-list__item {
-  width:75px !important; 
+  width:100px !important; 
   height: 75px !important;
 }
 
+.aside-main .upload-boarder .el-upload-list--picture-card .el-upload-list__item-actions span+span{
+  margin-left: 0.5rem;
+}
 
 .gen-main{
   width: 100%;
