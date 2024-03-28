@@ -322,19 +322,19 @@ const imgBgRef = ref<any>(null)
 
 // 表单提交
 const checkPrompt = (rule: any, value: any, callback: any) => {
-  if (!value) {
-    return callback(new Error('请输入行业信息'))
-  }
+  // if (!value) {
+  //   return callback(new Error('请输入Prompt'))
+  // }
   callback()
 }
 
 const validateNegPrompt = (rule: any, value: any, callback: any) => {
-  if (!value) {
-    return callback(new Error('请输入关键词'))
-  }
-  if (value === '') {
-    callback(new Error('请输入关键词'))
-  }
+  // if (!value) {
+  //   return callback(new Error('请输入NegativePrompt'))
+  // }
+  // if (value === '') {
+  //   callback(new Error('请输入NegativePrompt'))
+  // }
   callback()
 }
 
@@ -355,7 +355,7 @@ const rules = reactive<FormRules<typeof state.formInfo>>({
   ],
   prompt: [
     {
-      required: true,
+      required: false,
       message: '请设置正向描述',
       validator: checkPrompt, 
       trigger: 'blur' 
@@ -363,7 +363,7 @@ const rules = reactive<FormRules<typeof state.formInfo>>({
   ],
   negativePrompt: [
     {
-      required: true,
+      required: false,
       message: '请设置负向描述',
       validator: validateNegPrompt, 
       trigger: 'blur'
@@ -475,6 +475,8 @@ function submitForm(formEl: FormInstance | undefined) {
         state.generateList.forEach((item:any) => {
           item['genState'] = 0;
         })
+      }else{
+        state.generateList = []
       }
       state.isGenerateFinish = true
     } else {
@@ -608,7 +610,9 @@ function designPoster(id: any) {
   border-radius: 4px;
   min-height: 100px;
 }
-
+.el-form-item__content{
+  line-height: 0;
+}
 .upload-icon{
   width:110px; 
   height: 75px; 
@@ -626,6 +630,17 @@ function designPoster(id: any) {
 .el-upload-list__item {
   width:110px !important; 
   height: 75px !important;
+  margin: 0;
+  overflow: hidden;
+}
+
+.el-upload-list{
+  margin: 0;
+}
+
+.el-upload-list__item img{
+  width:100% !important; 
+  height: 100% !important;
 }
 
 .aside-main .upload-boarder .el-upload-list--picture-card .el-upload-list__item-actions span+span{

@@ -283,6 +283,8 @@ function submitForm(formEl: FormInstance | undefined) {
         state.generateList.forEach((item:any) => {
           item['genState'] = 0;
         })
+      }else{
+        state.generateList = []
       }
       state.isGenerateFinish = true
     } else {
@@ -411,8 +413,14 @@ function designPoster(id: any) {
 .el-upload-list__item {
   width:75px !important; 
   height: 75px !important;
+  overflow: hidden;
 }
 
+.el-upload-list__item img {
+  width: 100%; /* 让图片宽度填满容器 */
+  height: 100%; /* 让图片高度填满容器 */
+  object-fit: cover; /* 裁剪并居中图片以填满容器 */
+}
 
 .gen-main{
   width: 100%;

@@ -25,7 +25,7 @@
         </div>
       </el-collapse-item>
       <el-collapse-item title="背景设置" name="3">
-        <toggle-switch v-model="innerElement.isAI" label="AI填充" @finish="(value) => finish('isAI', value)" />
+        <!-- <toggle-switch v-model="innerElement.isAI" label="AI填充" @finish="(value) => finish('isAI', value)" /> -->
         <el-button style="width: 100%; margin: 0 0 1rem 0;" type="primary" link @click="showBgLib = true">在背景库中选择</el-button>
         <Tabs :value="mode" @update:value="onChangeMode">
           <TabPanel v-for="label in modes" :key="label" :label="label"></TabPanel>
