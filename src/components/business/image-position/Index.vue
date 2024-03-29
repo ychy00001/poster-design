@@ -7,7 +7,7 @@
 -->
 <template>
   <el-dialog v-model="state.show" title="位置设置" align-center width="70vw" @close="handleClose">
-    <div class="content">
+    <div class="image-position-content">
       <div v-if="state.fgImage == ''">
         <h3>暂无产品图</h3>
       </div>
@@ -87,7 +87,7 @@ const open = (fgImg: string, bgWidth:number, bgHeight:number, position: Array<nu
 const initCanvas = (bgWidth:number, bgHeight:number) =>{
   // 计算缩放比例
   let canvasContainer = document.getElementsByClassName("cv-container")[0]
-  let canvasContent = document.getElementsByClassName("content")[0]
+  let canvasContent = document.getElementsByClassName("image-position-content")[0]
   let parentHeightStr = window.getComputedStyle(canvasContainer).height
   let parentWidthStr = window.getComputedStyle(canvasContent).width
   console.log(parentWidthStr)
@@ -167,7 +167,7 @@ const handleClose = () => {
     flex-direction: column;
   }
 }
-.content {
+.image-position-content {
   position: relative;
   display: flex;
   justify-content: center;
