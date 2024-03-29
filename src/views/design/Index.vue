@@ -34,12 +34,12 @@
     <!-- 旋转缩放组件 -->
     <Moveable />
     <!-- 遮罩百分比进度条 -->
-    <ProgressLoading
-      :percent="state.downloadPercent"
-      :text="state.downloadText"
-      cancelText="取消"
-      @cancel="downloadCancel"
-      @done="state.downloadPercent = 0"
+    <ProgressLoading 
+      :percent="state.downloadPercent" 
+      :text="state.downloadText" 
+      cancelText="取消" 
+      @cancel="downloadCancel" 
+      @done="downloadDone" 
     />
   </div>
 </template>
@@ -169,7 +169,9 @@ function downloadCancel() {
   state.downloadPercent = 0
   state.isContinue = false
 }
-
+function downloadDone(){
+  state.downloadPercent=0
+}
 function loadData() {
   // 初始化加载页面
   const { id, tempid, tempType } = route.query

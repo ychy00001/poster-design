@@ -81,4 +81,7 @@ export default {
   setDTemplateInfoValue(state: Type.Object, { key, value } : Type.Object) {
     state.dTemplateInfo[key] = value
   },
+  templateSaveAsTrigger(state: Type.Object){
+    state.templateSaveAs++
+  }
 }

@@ -89,7 +89,8 @@ const all = {
       bizName: "",
       title: "",
       aiParam: ""
-    }
+    },
+    templateSaveAs: 0,  // 用来触发模版另存为，刷新模版列表
   },
   getters: {
     selectItem(state: any) {
@@ -190,6 +191,9 @@ const all = {
     // },
     dTemplateInfo(state:any){
       return state.dTemplateInfo
+    },
+    templateSaveAs(state:any){
+      return state.templateSaveAs
     }
   },
   mutations: {

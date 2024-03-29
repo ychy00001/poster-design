@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch, computed } from 'vue'
 import api from '@/api'
 import { useStore } from 'vuex'
 import { LocationQueryValue, useRoute, useRouter } from 'vue-router'
@@ -62,12 +62,19 @@ const state = reactive<TState>({
   searchKeyword: '',
 })
 
-const { dTemplateInfo, tempEditing, dHistoryParams } = useSetupMapGetters(['dTemplateInfo','tempEditing', 'dHistoryParams'])
+const { templateSaveAs, dTemplateInfo, tempEditing, dHistoryParams } = useSetupMapGetters(['templateSaveAs','dTemplateInfo','tempEditing', 'dHistoryParams'])
 
 const pageOptions: TPageOptions = { pageNo: 0, pageSize: 20, cate: 1 }
 const { cate, edit } = route.query
 cate && (pageOptions.cate = (cate as LocationQueryValue) || 1)
 edit && store.commit('managerEdit', true)
+
+watch(
+  () => templateSaveAs.value,
+  (val, oldVal) => {
+    load(true)
+  }
+)
 
 // onMounted(async () => {})
 

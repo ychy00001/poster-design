@@ -183,6 +183,7 @@ async function saveTemp(isCreate:boolean, showProcess: boolean) {
       })
       if (!res.code){
         store.commit('setDTemplateInfoValue', { key:"templateId", value:res}) 
+        store.commit('templateSaveAsTrigger')
         router.push({ path: '/design', query: { tempid: res }, replace: true })
       }
     }
