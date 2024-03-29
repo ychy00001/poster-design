@@ -124,6 +124,7 @@
 import type { FormInstance, FormRules, UploadProps, UploadUserFile } from 'element-plus'
 import { defineComponent, reactive, toRefs , ref, onMounted, watch} from 'vue'
 import { ElMessage as ElMsg } from 'element-plus'
+import { useStore } from 'vuex'
 import app_config from '@/config'
 import api from '@/api'
 
@@ -137,8 +138,9 @@ const state = reactive({
   generateList:[],
   isGenerateFinish: true,
 })
-
+const store = useStore()
 onMounted(() => {
+  store.commit('setShowMoveable', false)
   // 临时测试
   // state.generateList = [
   //   {

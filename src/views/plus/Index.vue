@@ -125,13 +125,13 @@
               </el-form-item>
 
               <el-form-item label="海报大小：" prop="imgNumber" >
-                <el-radio-group v-model="state.formInfo.posterSizeType" label="">
+                <el-radio-group v-model="posterSizeTypeRef" label="">
                   <el-radio :value="1">手机海报(9:16)540*960</el-radio>
                   <el-radio :value="2">电商主图(3:4)750*1000</el-radio>
                   <el-radio :value="3">公众号首图(7:3)1800*766</el-radio>
                   <el-radio :value="0">自定义</el-radio>
                 </el-radio-group>
-                <div v-if="state.formInfo.posterSizeType == 0" class="custom_size">
+                <div v-if="posterSizeTypeRef == 0" class="custom_size">
                   <el-input
                     v-model="state.formInfo.pageWidth"
                     style="width: 110px"
@@ -150,34 +150,38 @@
               </el-form-item>
 
               <el-form-item label="产品位置：" prop="widgetPosition" >
-                <el-input
-                  v-model="state.formInfo.left"
-                  style="width: 110px"
-                  placeholder="X"
-                >
-                  <template #prepend>X</template>
-                </el-input>
-                <el-input
-                  v-model="state.formInfo.top"
-                  style="width: 110px"
-                  placeholder="Y"
-                >
-                  <template #prepend>Y</template>
-                </el-input>
-                <el-input
-                  v-model="state.formInfo.width"
-                  style="width: 110px"
-                  placeholder="高度"
-                >
-                  <template #prepend>H</template>
-                </el-input>
-                <el-input
-                  v-model="state.formInfo.height"
-                  style="width: 110px"
-                  placeholder="宽度"
-                >
-                  <template #prepend>W</template>
-                </el-input>
+                <el-button class="position-btn" type="primary" @click="openImagePosition(state.formInfo.imgUrl, state.formInfo.pageBgImg)">点击设置</el-button>
+                <div>
+                  <el-input
+                    v-model="state.formInfo.left"
+                    style="width: 120px"
+                    placeholder="X"
+                  >
+                    <template #prepend>X</template>
+                  </el-input>
+                  <el-input
+                    v-model="state.formInfo.top"
+                    style="width: 120px"
+                    placeholder="Y"
+                  >
+                    <template #prepend>Y</template>
+                  </el-input>
+                  <el-input
+                    v-model="state.formInfo.width"
+                    style="width: 120px"
+                    placeholder="高度"
+                  >
+                    <template #prepend>H</template>
+                  </el-input>
+                  <el-input
+                    v-model="state.formInfo.height"
+                    style="width: 120px"
+                    placeholder="宽度"
+                  >
+                    <template #prepend>W</template>
+                  </el-input>
+                </div>
+                
               </el-form-item>
 
               <el-form-item label="StopAt：" prop="stopAt" >
@@ -238,6 +242,7 @@
     <img w-full :src="dialogimgUrl" alt="Preview Image" />
   </el-dialog>
   <imageCutout ref="imageCutoutRef" @done="cutImageDone" />
+  <imagePosition ref="imagePositionRef" @done="setPositionDone" />
 </template>
 
 <script lang="ts" setup>
@@ -246,7 +251,9 @@ import { defineComponent, reactive, toRefs , ref, onMounted, watch} from 'vue'
 import { ElMessage as ElMsg } from 'element-plus'
 import app_config from '@/config'
 import api from '@/api'
+import { useStore } from 'vuex'
 import imageCutout from '@/components/business/image-cutout'
+import imagePosition from '@/components/business/image-position'
 
 const state = reactive({
   formInfo: {
@@ -256,8 +263,8 @@ const state = reactive({
     negativePrompt: '(worst quality, low quality, normal quality, lowres, low details, oversaturated, undersaturated, overexposed, underexposed, grayscale, bw, bad photo, bad photography, bad art:1.4), (watermark, signature, text font, username, error, logo, words, letters, digits, autograph, trademark, name:1.2), (blur, blurry, grainy), morbid, ugly, asymmetrical, mutated malformed, mutilated, poorly lit, bad shadow, draft, cropped, out of frame, cut off, censored, jpeg artifacts, out of focus, glitch, duplicate, (bad hands, bad anatomy, bad body, bad face, bad teeth, bad arms, bad legs,(hand: 1.3) deformities:1.3)',
     imgNumber: 1,
     posterSizeType: 1,
-    pageWidth: 0,
-    pageHeight: 0,
+    pageWidth: 540,
+    pageHeight: 960,
     left : 50,
     top : 450,
     width: 480,
@@ -269,8 +276,9 @@ const state = reactive({
   generateList:[],
   isGenerateFinish: true,
 })
-
+const store = useStore()
 onMounted(() => {
+  store.commit('setShowMoveable', false)
   // 临时测试
   // state.generateList = [
   //   {
@@ -296,13 +304,26 @@ onMounted(() => {
   // ]
 })
 
-// 监听图片数
-// let imgNumber = ref(1)
-// watch(imgNumber, (newVal, oldVal) => {
-//   state.formInfo.imgNumber = newVal
-//   genGenList(newVal)
-//   console.log(state.generateList)
-// })
+
+// 监听海报大小
+const posterSizeTypeRef = ref<number>(1)
+watch(posterSizeTypeRef, (newVal, oldVal) => {
+  state.formInfo.posterSizeType = newVal
+  switch(newVal){
+    case 1:
+      state.formInfo.pageWidth = 540
+      state.formInfo.pageHeight = 960
+      break;
+    case 2:
+      state.formInfo.pageWidth = 750
+      state.formInfo.pageHeight = 1000
+      break;
+    case 3:
+      state.formInfo.pageWidth = 1800
+      state.formInfo.pageHeight = 766
+      break;
+  }
+})
 
 // 图片上传
 const dialogimgUrl = ref('')
@@ -315,7 +336,7 @@ const ruleFormRef = ref<FormInstance>()
 
 // 抠图
 const imageCutoutRef = ref<typeof imageCutout | null>(null)
-
+const imagePositionRef = ref<typeof imagePosition | null>(null)
 // 图片Ref 背景Ref
 const imgRef = ref<any>(null)
 const imgBgRef = ref<any>(null)
@@ -498,10 +519,39 @@ function submitForm(formEl: FormInstance | undefined) {
     })
 }
 
+// 打开图片位置设置
+function openImagePosition(img: string, bgImg: string) {
+  imagePositionRef.value?.open(
+    img, 
+    state.formInfo.pageWidth, 
+    state.formInfo.pageHeight, 
+    [ state.formInfo.left, state.formInfo.top, state.formInfo.width, state.formInfo.height ]
+  )
+  // fetch(img)
+    // .then((response) => response.blob())
+    // .then((blob) => {
+      // const file = new File([blob], `image_${Math.random()}.jpg`, { type: 'image/jpeg' })
+      // imageCutoutRef.value?.open(file)
+    // })
+    // .catch((error) => {
+      // console.error('获取图片失败:', error)
+    // })
+}
+
 // 完成抠图
 async function cutImageDone(url: string) {
   setTimeout(() => {
     state.formInfo.imgUrl = url
+  }, 300)
+}
+
+async function setPositionDone(data: Array<number>) {
+  console.log(data)
+  setTimeout(() => {
+    state.formInfo.left = data[0]
+    state.formInfo.top = data[1]
+    state.formInfo.width = data[2]
+    state.formInfo.height = data[3]
   }, 300)
 }
 
@@ -610,9 +660,10 @@ function designPoster(id: any) {
   border-radius: 4px;
   min-height: 100px;
 }
-.el-form-item__content{
-  line-height: 0;
+.aside-main  /deep/ .el-form-item__content{
+  line-height: 0px !important;
 }
+
 .upload-icon{
   width:110px; 
   height: 75px; 
@@ -645,6 +696,11 @@ function designPoster(id: any) {
 
 .aside-main .upload-boarder .el-upload-list--picture-card .el-upload-list__item-actions span+span{
   margin-left: 0.5rem;
+}
+
+.position-btn{
+  width: 100%;
+  margin: 8px auto;
 }
 
 .gen-main{
@@ -1089,7 +1145,7 @@ function designPoster(id: any) {
 }
 
 .aside-main /deep/ .el-slider .el-slider__input{
-  width: 83px !important;
+  width: 92px !important;
 }
 .aside-main /deep/ .el-slider .el-slider__input .el-input--small .el-input__wrapper{
   padding-left: 28px !important;
@@ -1100,7 +1156,7 @@ function designPoster(id: any) {
 }
 
 .aside-main /deep/ .el-form-item__content .el-input-group--prepend:nth-child(even){
-  margin-left: 14px;
+  margin-left: 32px;
 }
 .aside-main /deep/ .el-form-item__content .el-input-group--prepend:nth-child(n+3){
   margin-top: 8px;
